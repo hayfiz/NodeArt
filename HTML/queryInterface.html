@@ -1,10 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>NodeArt</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   </head>
   <body>
+  	<h1>Query some Twitter data</h1>
 
+	<form id="myForm" onsubmit="return false;">
+	    Query:<br>
+	    <input type="text" name="query" value="Drone">
+	    <br>
+	    Geocode:<br>
+	    <input type="text" name="location" value="51.5072,-0.126236"></input>
+	    <br>
+	    Radius:<br>
+	    <input type="text" name="radius" value="200km"></input>
+	    <br>
+	    <button id="sendButton">Query Data</button>
+	</form>
+	<script>
+
+	    function sendAjaxQuery(url, data) {
+	        $.ajax({
+	            type: 'POST',
+	            url: 'postFile.html',
+	            dataType:'json',
+	            data: data,
+	            success: function (data) {
+	                alert('success '+data);
+	                var struct= JSON.parse(data);
+	            },
+	            error: function (xhr, status, error) {
+	                console.log('Error: ' + error.message);
+	               alert('error connecting');
+	            }
+	        });
+	    }
+
+
+	    $.fn.serializeObject = function () {
+	        var o = {};
+	        var a = this.serializeArray();
+	        $.each(a, function () {
+	            if (o[this.name] !== undefined) {
+	                if (!o[this.name].push) {
+	                    o[this.name] = [o[this.name]];
+	                }
+	                o[this.name].push(this.value || '');
+	            } else {
+	                o[this.name] = this.value || '';
+	            }
+	        });
+	        return o;
+	    };
+
+	    function sendData() {
+	        var form = document.getElementById('myForm');
+	        sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
+	    }
+
+
+	    var sendButton = document.getElementById('sendButton');
+	    sendButton.onclick = sendData;
+
+	</script>
   </body>
 </html>
