@@ -32,9 +32,9 @@ var app = http.createServer(function (req, res) {
 
         });
         req.on('end', function () {
-            var modBody = JSON.parse(body);
-            console.log(modBody);
-            client.get('search/tweets', {q: modBody.query, count: 10, geocode: modBody.location+","+modBody.radius }, 
+            var queryContent = JSON.parse(body);
+            console.log(queryContent);
+            client.get('search/tweets', {q: queryContent.query, count: 10, geocode: queryContent.location+","+queryContent.radius }, 
                 function listDroneTweets(err, data, response) {
                     var tweets = [];
                     for (var indx in data.statuses) {
