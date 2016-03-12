@@ -1,70 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>NodeArt</title>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-  </head>
-  <body>
-  	<h1>Query some Twitter data</h1>
 
-	<form id="myForm" onsubmit="return false;">
-	    Query:<br>
-	    <input type="text" name="query" value="Drone">
-	    <br>
-	    Geocode:<br>
-	    <input type="text" name="location" value="51.5072,-0.126236"></input>
-	    <br>
-	    Radius:<br>
-	    <input type="text" name="radius" value="200km"></input>
-	    <br>
-	    <button id="sendButton">Query Data</button>
-	</form>
-	<script>
+<head>
+  <meta charset="utf-8">
+  <title>NodeArt</title>
+  <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
+</head>
 
-	    function sendAjaxQuery(url, data) {
-	        $.ajax({
-	            type: 'POST',
-	            url: 'postFile.html',
-	            dataType:'json',
-	            data: data,
-	            success: function (data) {
-	                alert('success '+data);
-	                var struct= JSON.parse(data);
-	            },
-	            error: function (xhr, status, error) {
-	                console.log('Error: ' + error.message);
-	               alert('error connecting');
-	            }
-	        });
-	    }
-
-
-	    $.fn.serializeObject = function () {
-	        var o = {};
-	        var a = this.serializeArray();
-	        $.each(a, function () {
-	            if (o[this.name] !== undefined) {
-	                if (!o[this.name].push) {
-	                    o[this.name] = [o[this.name]];
-	                }
-	                o[this.name].push(this.value || '');
-	            } else {
-	                o[this.name] = this.value || '';
-	            }
-	        });
-	        return o;
-	    };
-
-	    function sendData() {
-	        var form = document.getElementById('myForm');
-	        sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
-	    }
+<body>
+  <div class="ui container">
+    <h2 class="ui dividing header">Query some Twitter data</h2>
+    <form class="ui form" id="myForm" onsubmit="return false;">
+      <div class="field">
+        <label for="query">Query:</label>
+        <input type="text" name="query" value="Drone">
+      </div>
+      <div class="field">
+        <label for="geocode">Geocode:</label>
+        <input type="text" name="location" value="51.5072,-0.126236">
+      </div>
+      <div class="field">
+        <label for="radius">Radius:</label>
+        <input type="text" name="radius" value="200km">
+      </div>
+      <button class="ui button" id="sendButton">Query Data</button>
+    </form>
+  </div>
+  <script>
+    function sendAjaxQuery(url, data) {
+      $.ajax({
+        type: 'POST',
+        url: 'postFile.html',
+        dataType: 'json',
+        data: data,
+        success: function(data) {
+          alert('success ' + data);
+          var struct = JSON.parse(data);
+        },
+        error: function(xhr, status, error) {
+          console.log('Error: ' + error.message);
+          alert('error connecting');
+        }
+      });
+    }
 
 
-	    var sendButton = document.getElementById('sendButton');
-	    sendButton.onclick = sendData;
+    $.fn.serializeObject = function() {
+      var o = {};
+      var a = this.serializeArray();
+      $.each(a, function() {
+        if (o[this.name] !== undefined) {
+          if (!o[this.name].push) {
+            o[this.name] = [o[this.name]];
+          }
+          o[this.name].push(this.value || '');
+        } else {
+          o[this.name] = this.value || '';
+        }
+      });
+      return o;
+    };
 
-	</script>
-  </body>
+    function sendData() {
+      var form = document.getElementById('myForm');
+      sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
+    }
+
+
+    var sendButton = document.getElementById('sendButton');
+    sendButton.onclick = sendData;
+  </script>
+  <script src="/semantic/bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
+</body>
+
 </html>
