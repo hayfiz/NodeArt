@@ -34,7 +34,7 @@ var app = http.createServer(function (req, res) {
         req.on('end', function () {
             var queryContent = JSON.parse(body);
             console.log(queryContent);
-            client.get('search/tweets', {q: queryContent.teamName, count: 10, geocode: queryContent.location+","+queryContent.radius }, 
+            client.get('search/tweets', {q: queryContent.teamName /* +' '+queryContent.playerName*/}, 
                 function listDroneTweets(err, data, response) {
                     var tweets = [];
                     for (var indx in data.statuses) {

@@ -14,16 +14,20 @@
     <h2 class="ui dividing header">Query some Twitter data</h2>
     <form class="ui form" id="myForm" onsubmit="return false;">
       <div class="field">
-        <label for="query"> Enter a team name you would like to search for:</label>
+        <label for="teamName"> Enter the @ of a team you would like to search for:</label>
         <input type="text" name="teamName" value="@ManUtd">
       </div>
       <div class="field">
-        <label for="geocode">Geocode:</label>
-        <input type="text" name="location" value="51.5072,-0.126236">
+        <label for="playerName">Enter the @ of a player you'd like to find:</label>
+        <input type="text" name="playerName" value="@WayneRooney">
       </div>
       <div class="field">
-        <label for="radius">Radius:</label>
-        <input type="text" name="radius" value="200km">
+        <label for="hashtag">Enter any related hashtags:</label>
+        <input type="text" name="hashtag" value="#ManUtdVArsenal">
+      </div>
+      <div class="field">
+        <label for="keywords">Enter any specific keywords:</label>
+        <input type="text" name="keywords" value="">
       </div>
       <button class="ui button" id="sendButton">Query Data</button>
     </form>
