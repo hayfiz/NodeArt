@@ -33,17 +33,43 @@ var app = http.createServer(function (req, res) {
         req.on('end', function () {
             var queryContent = JSON.parse(body);
             console.log(queryContent);
-            
-            client.get('search/tweets', {q: queryContent.teamName /* +' '+queryContent.playerName*/}, 
-
+            if (queryContent.Or === 'No') {
+                client.get('search/tweets', {q: queryContent.teamName+' '+queryContent.playerName+' '+queryContent.keywords, tag:queryContent.hashtag}, 
                 function listDroneTweets(err, data, response) {
                     var tweets = [];
                     for (var indx in data.statuses) {
                         var tweet = data.statuses[indx];
-                        tweets.push('on: ' + tweet.created_at + ' : @' + tweet.user.screen_name + ' : ' + tweet.text+'\n\n')
+                        tweets.push('Author: '+tweet.user.name+' @'+tweet.user.screen_name+' Date: '+tweet.created_at+' Tweet: '+tweet.text);
                     }
                     console.log(tweets);
                 });
+            }
+            else {
+                client.get('search/tweets', {q: queryContent.teamName+' OR '+queryContent.playerName+' OR '+queryContent.keywords+' OR '+queryContent.hashtag}, 
+                function listDroneTweets(err, data, response) {
+                    var tweets = [];
+                    for (var indx in data.statuses) {
+                        var tweet = data.statuses[indx];
+                        tweets.push('Author: '+tweet.user.name+' @'+tweet.user.screen_name+' Date: '+tweet.created_at+' Tweet: '+tweet.text);
+                    }
+                    console.log(tweets);
+                });
+            }
+            
+
+            // client.get('statuses/user_timeline', { screen_name: queryContent.teamName},
+            //     function listStatuses (err, data, response) {
+            //       var tweets = [];
+            //       for (var indx in data) {
+            //         var tweet =  data[indx];
+            //           tweets.push('on: ' + tweet.created_at + ' : @' + tweet.user.screen_name + ' : ' + tweet.text+'\n\n');
+            //           //console.log('on: ' + tweet.created_at + ' : @' + tweet.user.screen_name + ' : ' + tweet.text+'\n\n');
+            //         }
+            //         console.log(tweets);
+                    
+            //     });
+
+
         });
     }
 
