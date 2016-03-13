@@ -12,7 +12,6 @@ var client = new Twit({
 });
 
 
-
 var file = new (static.Server)();
 var portNo = 3001;
 var app = http.createServer(function (req, res) {
@@ -34,7 +33,7 @@ var app = http.createServer(function (req, res) {
         req.on('end', function () {
             var queryContent = JSON.parse(body);
             console.log(queryContent);
-            client.get('search/tweets', {q: queryContent.teamName, count: 10, geocode: queryContent.location+","+queryContent.radius }, 
+            client.get('search/tweets', {q: queryContent.teamName, count: 10, geocode: queryContent.location+","+queryContent.radius },
                 function listDroneTweets(err, data, response) {
                     var tweets = [];
                     for (var indx in data.statuses) {
