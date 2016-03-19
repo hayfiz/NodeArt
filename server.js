@@ -33,19 +33,50 @@ var app = http.createServer(function (req, res) {
         req.on('end', function () {
             var queryContent = JSON.parse(body);
             console.log(queryContent);
-            if (queryContent.Or === 'No') {
-                client.get('search/tweets', {q: queryContent.teamName+' '+queryContent.playerName+' '+queryContent.keywords, tag:queryContent.hashtag}, 
+            var queryString = '';
+            var queryStringElements = [];
+            var queryOperator = queryContent.Or;
+            delete queryContent.Or;
+
+
+            // check Lodash, _.pick[queryContent[queryContent,'playerName','teamName'];
+            for(var key in queryContent){ //filtering out all the key value pairs wich are empty
+              if(!queryContent.hasOwnProperty(key)){ continue; } //making sure we itterate only on real keys and not prototype keys.
+
+              if(queryContent[key]!=''){
+                queryStringElements.push(queryContent[key]);
+              }
+            }
+
+            //building the query string from the filtered non-empty strings.
+            if (queryOperator === 'No') {
+                queryString = queryStringElements.join(' ');
+            }else{
+               queryString = queryStringElements.join(' OR ');
+            }
+
+            console.log(queryString);
+                //doing the query
+                client.get('search/tweets', { q: queryString },
                 function listDroneTweets(err, data, response) {
-                    var tweets = [];
+                    /*var tweets = [];
                     for (var indx in data.statuses) {
                         var tweet = data.statuses[indx];
                         tweets.push('Author: '+tweet.user.name+' @'+tweet.user.screen_name+' Date: '+tweet.created_at+' Tweet: '+tweet.text);
                     }
-                    console.log(tweets);
+                    console.log(tweets);*/
+
+                    res.write(JSON.stringify(data.statuses));
+                    res.end();
                 });
-            }
+
+                //so we are now sending an answer to the ajax request wis res.write,
+                // we are writing a json string that represents the array of tweets.
+                // in the success handler of the ajax request call on the front end,
+                // we modify the page's html to display the tweets.
+            /*}
             else {
-                client.get('search/tweets', {q: queryContent.teamName+' OR '+queryContent.playerName+' OR '+queryContent.keywords+' OR '+queryContent.hashtag}, 
+                client.get('search/tweets', {q: queryContent.teamName+' OR '+queryContent.playerName+' OR '+queryContent.keywords+' OR '+queryContent.hashtag},
                 function listDroneTweets(err, data, response) {
                     var tweets = [];
                     for (var indx in data.statuses) {
@@ -55,7 +86,7 @@ var app = http.createServer(function (req, res) {
                     console.log(tweets);
                 });
             }
-            
+            */
 
             // client.get('statuses/user_timeline', { screen_name: queryContent.teamName},
             //     function listStatuses (err, data, response) {
@@ -66,7 +97,7 @@ var app = http.createServer(function (req, res) {
             //           //console.log('on: ' + tweet.created_at + ' : @' + tweet.user.screen_name + ' : ' + tweet.text+'\n\n');
             //         }
             //         console.log(tweets);
-                    
+
             //     });
 
 
