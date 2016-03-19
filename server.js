@@ -38,12 +38,20 @@ var app = http.createServer(function (req, res) {
             var queryOperator = queryContent.Or;
             delete queryContent.Or;
 
+            //so we are now sending an answer to the ajax request wis res.write,
+            // we are writing a json string that represents the array of tweets.
+            // in the success handler of the ajax request call on the front end,
+            // we modify the page's html to display the tweets.
+
+
+
 
             // check Lodash, _.pick[queryContent[queryContent,'playerName','teamName'];
-            for(var key in queryContent){ //filtering out all the key value pairs wich are empty
-              if(!queryContent.hasOwnProperty(key)){ continue; } //making sure we itterate only on real keys and not prototype keys.
-
-              if(queryContent[key]!=''){
+            //filtering out all the key value pairs wich are empty
+            for(var key in queryContent){
+              //making sure we itterate only on real keys and not prototype keys.
+              if(!queryContent.hasOwnProperty(key)){ continue; }
+              if(queryContent[key] !== ''){
                 queryStringElements.push(queryContent[key]);
               }
             }
@@ -58,22 +66,20 @@ var app = http.createServer(function (req, res) {
             console.log(queryString);
                 //doing the query
                 client.get('search/tweets', { q: queryString },
-                function listDroneTweets(err, data, response) {
-                    /*var tweets = [];
+                function listDroneTweets(err, data, response) { //f(n) name should be changed
+                 /* var tweets = [];
                     for (var indx in data.statuses) {
                         var tweet = data.statuses[indx];
                         tweets.push('Author: '+tweet.user.name+' @'+tweet.user.screen_name+' Date: '+tweet.created_at+' Tweet: '+tweet.text);
                     }
-                    console.log(tweets);*/
+                    console.log(tweets);
+                */
 
                     res.write(JSON.stringify(data.statuses));
                     res.end();
                 });
 
-                //so we are now sending an answer to the ajax request wis res.write,
-                // we are writing a json string that represents the array of tweets.
-                // in the success handler of the ajax request call on the front end,
-                // we modify the page's html to display the tweets.
+
             /*}
             else {
                 client.get('search/tweets', {q: queryContent.teamName+' OR '+queryContent.playerName+' OR '+queryContent.keywords+' OR '+queryContent.hashtag},
@@ -106,7 +112,7 @@ var app = http.createServer(function (req, res) {
 
     else {
         file.serve(req, res, function (err, result) {
-            if (err != null) {
+            if (err !== null) {
                 console.error('Error serving %s - %s', req.url, err.message);
                 if (err.status === 404 || err.status === 500) {
                     file.serveFile(util.format('/%d.html', err.status), err.status, {}, req, res);
