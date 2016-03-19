@@ -66,7 +66,7 @@ var app = http.createServer(function (req, res) {
             console.log(queryString);
                 //doing the query
                 client.get('search/tweets', { q: queryString },
-                function listDroneTweets(err, data, response) { //f(n) name should be changed
+                function searchTweets(err, data, response) { //f(n) name should be changed
                  /* var tweets = [];
                     for (var indx in data.statuses) {
                         var tweet = data.statuses[indx];
