@@ -36,9 +36,17 @@ var app = http.createServer(function (req, res) {
             var queryString = '';
             var queryStringElements = [];
             var queryOperator = queryContent.Or;
+            var queryTeamAuthoredTweets = queryContent.TeamAut;
+            var queryTeamMentionedTweets = queryContent.TeamMen;
+            var queryPlayerAuthoredTweets = queryContent.PlayerAut;
+            var queryPlayerMentionedTweets = queryContent.PlayerMen;
+            delete queryContent.TeamAut;
+            delete queryContent.TeamMen;
+            delete queryContent.PlayerAut;
+            delete queryContent.PlayerMen;
             delete queryContent.Or;
 
-            //so we are now sending an answer to the ajax request wis res.write,
+            //so we are now sending an answer to the ajax request with res.write,
             // we are writing a json string that represents the array of tweets.
             // in the success handler of the ajax request call on the front end,
             // we modify the page's html to display the tweets.
@@ -63,50 +71,155 @@ var app = http.createServer(function (req, res) {
                queryString = queryStringElements.join(' OR ');
             }
 
+            //checks if author and mentions checkboxes are ticked for team
+            var teamAutAndMention = (queryTeamAuthoredTweets === 'YES') && (queryTeamMentionedTweets ==='YES');
+            //checks if author and mentions checkboxes are ticked for player
+            var playerAutAndMention = (queryPlayerAuthoredTweets === 'YES') && (queryPlayerMentionedTweets === 'YES');
             console.log(queryString);
                 //doing the query
-                client.get('search/tweets', { q: queryString },
-                function searchTweets(err, data, response) { //f(n) name should be changed
-                 /* var tweets = [];
-                    for (var indx in data.statuses) {
-                        var tweet = data.statuses[indx];
-                        tweets.push('Author: '+tweet.user.name+' @'+tweet.user.screen_name+' Date: '+tweet.created_at+' Tweet: '+tweet.text);
-                    }
-                    console.log(tweets);
-                */
 
-                    res.write(JSON.stringify(data.statuses));
-                    res.end();
+                /*The if statements below check for the different cases possible with the queries*/
+                if ((teamAutAndMention && playerAutAndMention) || 
+                    ((queryTeamAuthoredTweets === 'YES') && playerAutAndMention) || 
+                    ((queryPlayerAuthoredTweets === 'YES') && teamAutAndMention)) {
+                    tweetsArray = [];
+                    /* Function call for mentions search which calls back to listStatuses 
+                    in order to gain access to authored tweets */
+                    client.get('search/tweets', { q: queryString, count: 300 },
+                        function searchTweets(err, data, listStatuses) { 
+                         tweetsArray.push(JSON.stringify(data.statuses));
+                    /* Callback function which waits until the data from searchTweets is complete
+                    before running */
+                    client.get('statuses/user_timeline', { screen_name: queryContent.teamName},
+                    function listStatuses (err, data, listPlayerStatuses) {
+                        tweetsArray.push(JSON.stringify(data));
+
+                       client.get('statuses/user_timeline', { screen_name: queryContent.playerName},
+                    function listPlayerStatuses (err, data, response) {
+                        tweetsArray.push(JSON.stringify(data));
+                        var tweets = JSON.parse(tweetsArray[0]);
+                        var tweetsB = JSON.parse(tweetsArray[1]);
+                        var tweetsC = JSON.parse(tweetsArray[2]);
+                        intermediateTweets = tweetsB.concat(tweetsC);
+                        finalTweets = tweets.concat(intermediateTweets);
+                        res.write(JSON.stringify(finalTweets), function(err) { res.end(); });
+                        });
+                    });
                 });
-
-
-            /*}
-            else {
-                client.get('search/tweets', {q: queryContent.teamName+' OR '+queryContent.playerName+' OR '+queryContent.keywords+' OR '+queryContent.hashtag},
-                function listDroneTweets(err, data, response) {
-                    var tweets = [];
-                    for (var indx in data.statuses) {
-                        var tweet = data.statuses[indx];
-                        tweets.push('Author: '+tweet.user.name+' @'+tweet.user.screen_name+' Date: '+tweet.created_at+' Tweet: '+tweet.text);
-                    }
-                    console.log(tweets);
-                });
-            }
-            */
-
-            // client.get('statuses/user_timeline', { screen_name: queryContent.teamName},
-            //     function listStatuses (err, data, response) {
-            //       var tweets = [];
-            //       for (var indx in data) {
-            //         var tweet =  data[indx];
-            //           tweets.push('on: ' + tweet.created_at + ' : @' + tweet.user.screen_name + ' : ' + tweet.text+'\n\n');
-            //           //console.log('on: ' + tweet.created_at + ' : @' + tweet.user.screen_name + ' : ' + tweet.text+'\n\n');
-            //         }
-            //         console.log(tweets);
-
-            //     });
-
-
+                }
+                else if ( teamAutAndMention ) {
+                    tweetsArray = [];
+                    /* Function call for mentions search which calls back to listStatuses 
+                    in order to gain access to authored tweets */
+                    client.get('search/tweets', { q: queryString, count: 300 },
+                        function searchTweets(err, data, listStatuses) { 
+                         tweetsArray.push(JSON.stringify(data.statuses));
+                    /* Callback function which waits until the data from searchTweets is complete
+                    before running */
+                    client.get('statuses/user_timeline', { screen_name: queryContent.teamName},
+                    function listStatuses (err, data, response) {
+                        tweetsArray.push(JSON.stringify(data));
+                        var tweets = JSON.parse(tweetsArray[0]);
+                        var tweetsB = JSON.parse(tweetsArray[1]);
+                        finalTweets = tweets.concat(tweetsB);
+                        res.write(JSON.stringify(finalTweets), function(err) { res.end(); });
+                    });
+                }); 
+                }
+                else if ( playerAutAndMention ) {
+                    tweetsArray = [];
+                    /* Function call for mentions search which calls back to listStatuses 
+                    in order to gain access to authored tweets */
+                    client.get('search/tweets', { q: queryString, count: 300 },
+                        function searchTweets(err, data, listStatuses) { 
+                         tweetsArray.push(JSON.stringify(data.statuses));
+                    /* Callback function which waits until the data from searchTweets is complete
+                    before running */
+                    client.get('statuses/user_timeline', { screen_name: queryContent.playerName},
+                    function listStatuses (err, data, response) {
+                        tweetsArray.push(JSON.stringify(data));
+                        var tweets = JSON.parse(tweetsArray[0]);
+                        var tweetsB = JSON.parse(tweetsArray[1]);
+                        finalTweets = tweets.concat(tweetsB);
+                        res.write(JSON.stringify(finalTweets), function(err) { res.end(); });
+                    });
+                }); 
+                }
+                else if ((queryOperator === 'YES') && (queryTeamAuthoredTweets === 'YES') && (queryPlayerAuthoredTweets === 'YES')) {
+                tweetsArray = [];
+                    /* Function call for mentions search which calls back to listStatuses 
+                    in order to gain access to authored tweets */
+                    client.get('statuses/user_timeline', { screen_name: queryContent.teamName},
+                        function listTeamStatuses(err, data, listPlayerStatuses) { 
+                         tweetsArray.push(JSON.stringify(data));
+                    /* Callback function which waits until the data from searchTweets is complete
+                    before running */
+                    client.get('statuses/user_timeline', { screen_name: queryContent.playerName},
+                    function listPlayerStatuses (err, data, response) {
+                        tweetsArray.push(JSON.stringify(data));
+                        var tweets = JSON.parse(tweetsArray[0]);
+                        var tweetsB = JSON.parse(tweetsArray[1]);
+                        finalTweets = tweets.concat(tweetsB);
+                        res.write(JSON.stringify(finalTweets), function(err) { res.end(); });
+                    });
+                }); 
+                }
+                else if ((queryTeamAuthoredTweets === 'YES') && (queryOperator === 'YES')) {
+                tweetsArray = [];
+                    /* Function call for mentions search which calls back to listStatuses 
+                    in order to gain access to authored tweets */
+                    client.get('search/tweets', { q: queryString, count: 300 },
+                        function searchTweets(err, data, listStatuses) { 
+                         tweetsArray.push(JSON.stringify(data.statuses));
+                    /* Callback function which waits until the data from searchTweets is complete
+                    before running */
+                    client.get('statuses/user_timeline', { screen_name: queryContent.TeamName},
+                    function listStatuses (err, data, response) {
+                        tweetsArray.push(JSON.stringify(data));
+                        var tweets = JSON.parse(tweetsArray[0]);
+                        var tweetsB = JSON.parse(tweetsArray[1]);
+                        finalTweets = tweets.concat(tweetsB);
+                        res.write(JSON.stringify(finalTweets), function(err) { res.end(); });
+                    });
+                }); 
+                }
+                else if ((queryPlayerAuthoredTweets === 'YES') && (queryOperator === 'YES')) {
+                    tweetsArray = [];
+                    /* Function call for mentions search which calls back to listStatuses 
+                    in order to gain access to authored tweets */
+                    client.get('search/tweets', { q: queryString, count: 300 },
+                        function searchTweets(err, data, listStatuses) { 
+                         tweetsArray.push(JSON.stringify(data.statuses));
+                    /* Callback function which waits until the data from searchTweets is complete
+                    before running */
+                    client.get('statuses/user_timeline', { screen_name: queryContent.playerName},
+                    function listStatuses (err, data, response) {
+                        tweetsArray.push(JSON.stringify(data));
+                        var tweets = JSON.parse(tweetsArray[0]);
+                        var tweetsB = JSON.parse(tweetsArray[1]);
+                        finalTweets = tweets.concat(tweetsB);
+                        res.write(JSON.stringify(finalTweets), function(err) { res.end(); });
+                    });
+                }); 
+                }
+                else if (queryTeamAuthoredTweets === 'YES') {
+                client.get('statuses/user_timeline', { screen_name: queryContent.teamName},
+                    function listStatuses (err, data, response) {
+                    res.write(JSON.stringify(data), function(err) { res.end(); });
+                    });
+                }
+                else if (queryPlayerAuthoredTweets === 'YES') {
+                client.get('statuses/user_timeline', { screen_name: queryContent.playerName},
+                    function listStatuses (err, data, response) {
+                    res.write(JSON.stringify(data), function(err) { res.end(); });
+                    });
+                }
+                else {
+                    client.get('search/tweets', { q: queryString, count: 300 },
+                        function searchTweets(err, data, response) { 
+                            res.write(JSON.stringify(data.statuses), function(err) { res.end(); });
+                        });
+                }
         });
     }
 
