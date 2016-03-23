@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="af6f21e4-f202-4dd3-8b47-69bfb0cf07a9" name="Default" comment="HTML: Added a simple form of validation to the form&#10;JS: fixed some typos.">
+    <list default="true" id="af6f21e4-f202-4dd3-8b47-69bfb0cf07a9" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/queryInterface.html" afterPath="$PROJECT_DIR$/queryInterface.html" />
     </list>
     <ignored path="NodeArt.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -701,7 +700,7 @@
       <workItem from="1458744466564" duration="211000" />
       <workItem from="1458744696035" duration="816000" />
       <workItem from="1458745645693" duration="2788000" />
-      <workItem from="1458751932755" duration="781000" />
+      <workItem from="1458751932755" duration="803000" />
     </task>
     <task id="LOCAL-00001" summary="HTML: Added a simple form of validation to the form&#10;JS: fixed some typos.">
       <created>1458753131336</created>
@@ -710,11 +709,18 @@
       <option name="project" value="LOCAL" />
       <updated>1458753131336</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="HTML: Added a simple form of validation to the form&#10;JS: fixed some typos.">
+      <created>1458753154426</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1458753154426</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5418000" />
+    <option name="totallyTimeSpent" value="5440000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="896" extended-state="6" />
@@ -866,6 +872,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-5264">
           <caret line="6" column="23" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
