@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <title>NodeArt</title>
   <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
- <script src="/semantic/bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="/semantic/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
 </head>
 
@@ -13,30 +13,36 @@
   <div class="ui container">
     <h2 class="ui dividing header">Query some Twitter data</h2>
     <form class="ui form" id="myForm" onsubmit="return false;">
-      <input type="radio" name="Or" value="No"> AND<br>
-      <input type="radio" name="Or" value="YES"> OR<br>
+      <input type="radio" name="Or" value="No"> AND
+      <br>
+      <input type="radio" name="Or" value="YES"> OR
+      <br>
       <div class="field">
         <label for="teamName"> Enter the @ of a team you would like to search for:</label>
         <input type="text" name="teamName" placeholder="@ManUtd">
+        <br>
+        <br>
         <div class="ui-checkbox">
-        	<input type="checkbox" name="TeamAut" value="YES"></input>
-        	<label> Author</label>
+          <input type="checkbox" name="TeamAut" value="YES">
+          <label> Author</label>
         </div>
         <div class="ui-checkbox">
-        	<input type="checkbox" name="TeamMen" value="YES"></input>
-        	<label> Mentions</label>
+          <input type="checkbox" name="TeamMen" value="YES">
+          <label> Mentions</label>
         </div>
       </div>
       <div class="field">
         <label for="playerName">Enter the @ of a player you'd like to find:</label>
         <input type="text" name="playerName" placeholder="@WayneRooney">
+        <br>
+        <br>
         <div class="ui-checkbox">
-        	<input type="checkbox" name="PlayerAut" value="YES"></input>
-        	<label> Author</label>
+          <input type="checkbox" name="PlayerAut" value="YES">
+          <label> Author</label>
         </div>
         <div class="ui-checkbox">
-        	<input type="checkbox" name="PlayerMen" value="YES"></input>
-        	<label> Mentions</label>
+          <input type="checkbox" name="PlayerMen" value="YES">
+          <label> Mentions</label>
         </div>
       </div>
       <div class="field">
@@ -49,12 +55,18 @@
       </div>
       <button class="ui button" id="sendButton">Query Data</button>
     </form>
+    <br>
+    <div class="ui fluid card">
+      <div class="content">
+        <div class="header">Tweets Timeline</div>
+        <ul id="result">
 
-    <ul id="result">
+        </ul>
+      </div>
       <!-- for now lets make it simple -->
-    </ul>
-  </div>
+    </div>
 
+  </div>
   <script>
     function sendAjaxQuery(url, data) {
       $('#result').html('');
@@ -66,17 +78,17 @@
         success: function(tweets) {
           //alert('success ' + data);
           //var struct = JSON.parse(data); //converting to object again
-          for(var i = 0; i < tweets.length; i++){
+          for (var i = 0; i < tweets.length; i++) {
             var tweet = tweets[i];
             var date = new Date(tweet.created_at);
             var tweetHtml = `
               <li>
-                Author : ` + tweet.user.name  + ' @' + tweet.user.screen_name + ' Date:' + date.toISOString() +'<br> ' +
-               `Tweet : `+ tweet.text
-                Retweet :
-                `</li>
+                Author : ` + tweet.user.name + ' @' + tweet.user.screen_name + ' Date:' + date.toISOString() + '<br> ' +
+              `Tweet : ` + tweet.text
+            //Retweet:
+              `</li>
             `;
-          //  $('#result').append('<li>' + JSON.stringify(tweets[i]) + '</li>'); this bring out the tweet object as a whole
+            //  $('#result').append('<li>' + JSON.stringify(tweets[i]) + '</li>'); this bring out the tweet object as a whole
             $('#result').append(tweetHtml) // sends the tweet object to the browser
 
             delete tweets;
@@ -84,7 +96,7 @@
         },
         error: function(xhr, status, error) {
           console.log('Error: ' + error.message);
-          $('#result').append('<li>Something went wrong sorry.</li>'); // error output on webpage
+          $('#result').append('<li>Something went wrong sorry.</li>'); // error output on web page
           //alert('error connecting');
         }
       });
@@ -116,6 +128,17 @@
     var sendButton = document.getElementById('sendButton');
     sendButton.onclick = sendData;
   </script>
+
+  <script type="text/javascript">
+  $('.ui.form')
+  .form({
+    fields: {
+      teamName : 'empty'//,
+      //playerName : 'empty'
+
+    }
+  });
+</script>
 </body>
 
 </html>
