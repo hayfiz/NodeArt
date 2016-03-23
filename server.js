@@ -47,9 +47,9 @@ var app = http.createServer(function (req, res) {
 
 
             // check Lodash, _.pick[queryContent[queryContent,'playerName','teamName'];
-            //filtering out all the key value pairs wich are empty
+            //filtering out all the key value pairs which are empty
             for(var key in queryContent){
-              //making sure we itterate only on real keys and not prototype keys.
+              //making sure we iterate only on real keys and not prototype keys.
               if(!queryContent.hasOwnProperty(key)){ continue; }
               if(queryContent[key] !== ''){
                 queryStringElements.push(queryContent[key]);
