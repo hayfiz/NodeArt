@@ -7,10 +7,18 @@
   <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
   <script src="/semantic/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
+  <script src="/node_modules/lodash/lodash.min.js" type="text/javascript"></script>
 </head>
 
 <body>
   <div class="ui container">
+    <h1 class="ui header">
+      <span class="ui image"><i class="feed icon"></i></span>
+        <div class="content">
+          Twitter Scrapper
+        </div>
+    </h1>
     <h2 class="ui dividing header">Query some Twitter data</h2>
     <form class="ui form" id="myForm" onsubmit="return false;">
       <input type="radio" name="Or" value="No"> AND
@@ -59,6 +67,9 @@
     <div class="ui fluid card">
       <div class="content">
         <div class="header">Tweets Timeline</div>
+        <div id="counts">
+
+        </div>
         <ul id="result">
 
         </ul>
@@ -67,78 +78,100 @@
     </div>
 
   </div>
+
   <script>
-    function sendAjaxQuery(url, data) {
-      $('#result').html('');
-      $.ajax({
-        type: 'POST',
-        url: 'postFile.html',
-        dataType: 'json',
-        data: data,
-        success: function(tweets) {
-          //alert('success ' + data);
-          //var struct = JSON.parse(data); //converting to object again
-          for (var i = 0; i < tweets.length; i++) {
-            var tweet = tweets[i];
-            var date = new Date(tweet.created_at);
-            var tweetHtml = `
-              <li>
-                Author : ` + tweet.user.name + ' @' + tweet.user.screen_name + ' Date:' + date.toISOString() + '<br> ' +
-              `Tweet : ` + tweet.text
-            //Retweet:
-              `</li>
-            `;
-            //  $('#result').append('<li>' + JSON.stringify(tweets[i]) + '</li>'); this bring out the tweet object as a whole
-            $('#result').append(tweetHtml) // sends the tweet object to the browser
+      function sendAjaxQuery(url, data) {
+          $('#result').html('');
+          $.ajax({
+              type: 'POST',
+              url: 'postFile.html',
+              dataType: 'json',
+              data: data,
+              success: function(tweets) {
+                  //alert('success ' + data);
+                  //var struct = JSON.parse(data); //converting to object again
+                  var wordCounts = [];
+                  _.each(tweets,function(tweet){
+                  var date = new Date(tweet.created_at);
+                  var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
+                  var words_parse = initial_words.replace(/httpstc|RT/gi, "");
+                  var words = words_parse.split(' ');
 
-            delete tweets;
-          }
-        },
-        error: function(xhr, status, error) {
-          console.log('Error: ' + error.message);
-          $('#result').append('<li>Something went wrong sorry.</li>'); // error output on web page
-          //alert('error connecting');
-        }
-      });
-    }
+                  _.each(words,function(word) {
+                    var foundWord = _.find(wordCounts, {word: word});
+                    if (foundWord) {
+                    if (word !== "" && word !== undefined)
+                        foundWord.count += 1;
+                    } else {  // no word found
+                        wordCounts.push({word: word, count: 1});
+                    }
+
+                  });
 
 
-    $.fn.serializeObject = function() {
-      var o = {};
-      var a = this.serializeArray();
-      $.each(a, function() {
-        if (o[this.name] !== undefined) {
-          if (!o[this.name].push) {
-            o[this.name] = [o[this.name]];
-          }
-          o[this.name].push(this.value || '');
-        } else {
-          o[this.name] = this.value || '';
-        }
-      });
-      return o;
-    };
+                  var tweetHtml = "<li>" + " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + '<br>'
+                                  +  "  Author: " + tweet.user.name + ' @' + tweet.user.screen_name + ' Date: ' + moment(date).format("hh:mm ddd DD MMM YYYY") + '<br> '
+                                  + "  Tweet: " + tweet.htmlContent + //tweet.text - replace when you get an undefined error. and for server 1
+                                  (tweet.retweeted_status ? "<br>  Retweet: " + tweet.retweeted_status.user.screen_name : "") + "</li>";
+                          $('#result').append(tweetHtml); // sends the tweet object to the browser
 
-    function sendData() {
-      var form = document.getElementById('myForm');
-      sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
-    }
+                        });
 
+                  var counted;
+                  var sortedWordCounts = _.sortBy(wordCounts,function(word){ return _.take(word.count); });
+                  counted = _.take(sortedWordCounts,21);
+                  console.log(counted.sort(function (a,b) { var sorted_count = b.count - a.count
+                    return sorted_count;
+                    }));
+                    $('#counts').append('<div>'+ "Most Frequent Words: " + JSON.stringify(counted,null, 4) + '</div>');
+                    },
 
-    var sendButton = document.getElementById('sendButton');
-    sendButton.onclick = sendData;
+              error: function(xhr, status, error) {
+                  console.log('Error: ' + error.message);
+                  $('#result').append('<li>' + 'Something went wrong sorry.' + '</li>'); // error output on webpage
+                  //alert('error connecting');
+              }
+
+          });
+
+      }
+      $.fn.serializeObject = function() {
+          var o = {};
+          var a = this.serializeArray();
+          $.each(a, function() {
+              if (o[this.name] !== undefined) {
+                  if (!o[this.name].push) {
+                      o[this.name] = [o[this.name]];
+                  }
+                  o[this.name].push(this.value || '');
+              } else {
+                  o[this.name] = this.value || '';
+              }
+          });
+          return o;
+      };
+      function sendData() {
+          var form = document.getElementById('myForm');
+          sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
+      }
+      var sendButton = document.getElementById('sendButton');
+      sendButton.onclick = sendData;
   </script>
 
-  <script type="text/javascript">
+
+<script>
   $('.ui.form')
-  .form({
-    fields: {
-      teamName : 'empty'//,
-      //playerName : 'empty'
+    .form({
+      fields: {
+        teamName: 'empty',
+        playerName : 'empty'
 
     }
-  });
+});
 </script>
+
 </body>
+<!-- + " <img class='"ui avatar image"' src=' "+ tweet.user.profile_image_url + "'>" -->
+<!--- tweet.htmlContent -->
 
 </html>
