@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="af6f21e4-f202-4dd3-8b47-69bfb0cf07a9" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server1.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/queryInterface.html" afterPath="$PROJECT_DIR$/queryInterface.html" />
-    </list>
+    <list default="true" id="af6f21e4-f202-4dd3-8b47-69bfb0cf07a9" name="Default" comment="" />
     <ignored path="NodeArt.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path=".idea/dataSources.local.xml" />
@@ -61,7 +57,7 @@
             <state vertical-scroll-proportion="0.48824343">
               <caret line="113" column="48" selection-start-line="113" selection-start-column="48" selection-end-line="113" selection-end-column="48" />
               <folding>
-                <marker date="1458810287000" expanded="true" signature="3912:4370" placeholder="..." />
+                <marker date="1458810797000" expanded="true" signature="3912:4449" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -690,7 +686,7 @@
       <workItem from="1458744696035" duration="816000" />
       <workItem from="1458745645693" duration="2788000" />
       <workItem from="1458751932755" duration="23459000" />
-      <workItem from="1458804084868" duration="3382000" />
+      <workItem from="1458804084868" duration="3635000" />
     </task>
     <task id="LOCAL-00001" summary="HTML: Added a simple form of validation to the form&#10;JS: fixed some typos.">
       <created>1458753131336</created>
@@ -714,7 +710,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31478000" />
+    <option name="totallyTimeSpent" value="31731000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="896" extended-state="6" />
@@ -803,7 +799,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1458810287000" expanded="true" signature="3912:4370" placeholder="..." />
+            <marker date="1458810797000" expanded="true" signature="3912:4449" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -970,7 +966,7 @@
         <state vertical-scroll-proportion="0.48824343">
           <caret line="113" column="48" selection-start-line="113" selection-start-column="48" selection-end-line="113" selection-end-column="48" />
           <folding>
-            <marker date="1458810287000" expanded="true" signature="3912:4370" placeholder="..." />
+            <marker date="1458810797000" expanded="true" signature="3912:4449" placeholder="..." />
           </folding>
         </state>
       </provider>
