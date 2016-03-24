@@ -8,7 +8,8 @@
   <script src="/semantic/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
-  <script src="/node_modules/lodash/lodash.min.js" type="text/javascript"></script>
+ <!-- <script src="/node_modules/lodash/lodash.min.js" type="text/javascript"></script> -->
+  <script src="https://cdn.jsdelivr.net/lodash/4.6.1/lodash.min.js" type="text/javascript"></script>
 </head>
 
 <body>
@@ -110,7 +111,7 @@
 
 
                   var tweetHtml = "<li>" + " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + '<br>'
-                                  +  "  Author: " + tweet.user.name + ' @' + tweet.user.screen_name + ' Date: ' + moment(date).format("hh:mm ddd DD MMM YYYY") + '<br> '
+                                  +  "  Author: " + tweet.user.name + '\t\t' + ' @' + tweet.user.screen_name +'\t\t'+ ' Date: ' + moment(date).format("hh:mm ddd DD MMM YYYY") + '<br> '
                                   + "  Tweet: " + tweet.htmlContent + //tweet.text - replace when you get an undefined error. and for server 1
                                   (tweet.retweeted_status ? "<br>  Retweet: " + tweet.retweeted_status.user.screen_name : "") + "</li>";
                           $('#result').append(tweetHtml); // sends the tweet object to the browser
