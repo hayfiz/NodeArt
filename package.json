@@ -1,0 +1,36 @@
+{
+  "name": "nodeart",
+  "version": "1.0.0",
+  "description": "A simple social network scrapper based on a node.js server using the official Twitter API",
+  "main": "server.js",
+  "dependencies": {
+    "favicon": "^0.0.2",
+    "lodash": "^4.6.1",
+    "node-static": "^0.7.7",
+    "serve-favicon": "^2.3.0",
+    "twit": "^2.2.3",
+    "twitter-text": "latest"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server1.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hayfiz/NodeArt.git"
+  },
+  "keywords": [
+    "git",
+    "twitter",
+    "api",
+    "googlemaps",
+    "etc."
+  ],
+  "author": "Enoc Leonrd, Hayford Idor..",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hayfiz/NodeArt/issues"
+  },
+  "homepage": "https://github.com/hayfiz/NodeArt#readme"
+}
