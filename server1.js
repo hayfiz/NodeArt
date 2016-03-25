@@ -47,7 +47,6 @@ var app = http.createServer(function(req, res) {
         }).end();
         req.connection.destroy();
       }
-
     });
     req.on('end', function() {
       var queryContent = JSON.parse(body);
@@ -104,7 +103,11 @@ var app = http.createServer(function(req, res) {
            in order to gain access to authored tweets */
         client.get('search/tweets', {
           q: queryString,
+<<<<<<< HEAD
           count: 10 //i reduced this because of the limit thingy
+=======
+           count: 300 //, geocode: "53.383055,-1.464795,200km"
+>>>>>>> 1f40b7c4318277cbf778dd7f18c45ba75a6e3e00
         }, function(err, res) {
           cb(err, res && res.statuses);
         });
@@ -159,6 +162,7 @@ var app = http.createServer(function(req, res) {
             error: "There was an error: " + err
           }, false);
         }
+        console.log(tweets);
         sendJsonResponse(tweets);
       }
 
