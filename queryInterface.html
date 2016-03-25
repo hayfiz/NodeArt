@@ -146,7 +146,8 @@
                   console.log(counted.sort(function (a,b) { var sorted_count = b.count - a.count
                     return sorted_count;
                     }));
-                    $('#counts').append('<div>'+ "Most Frequent Words: " + JSON.stringify(counted,null, 4) + '</div>');
+                    $('#most_frequent_words').remove();
+                    $('#counts').append('<div id="most_frequent_words">'+ "Most Frequent Words: " + JSON.stringify(counted,null, 4) + '</div>');
 
                     /* Geolocation map*/
                     function initialize() {
