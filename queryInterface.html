@@ -8,6 +8,8 @@
     <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/lodash/4.6.1/lodash.min.js" type="text/javascript"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXG2-B1ZOvxVuvvd-jhdi9WVPu-J2ricQ&amp;sensor=false">
+    </script>
 </head>
 
 <body>
@@ -76,10 +78,12 @@
         </div>
 <!-- for now lets make it simple -->
     </div>
-
-</div>
-
-
+    <div class="ui fluid card">
+        <div class="content">
+            <div class="header">Tweet locations</div>
+            <div id="map-canvas" style="width:50%;height:300pt;align:center;"></div>
+        </div>
+    </div>
 
 <script>
     function sendAjaxQuery(url, data) {
@@ -91,6 +95,12 @@
             data: data,
             success: function (tweets) {
 
+                // maps
+                var latCoordinates = [];
+                var longCoordinates = [];
+                var tweetHTMLArray = [];
+
+                //words and users
                 var wordCounts = {};
                 var userCounts = {};
                 var mostUsedWords = [];
@@ -124,6 +134,15 @@
                             + "  Tweet: " + tweet.htmlContent +
                             (tweet.retweeted_status ? "<br>  Retweet: " + tweet.retweeted_status.user.screen_name : "") + "</li>";
                     $('#result').append(tweetHtml); // sends the tweet object to the browser
+                    $('#most_frequent_words').remove();
+                    // maps
+                    tweetHTMLArray.push(tweetHtml);
+                    if (tweet.geo != null ) {
+                        var tweet_lat = tweet.geo.coordinates[0];
+                        var tweet_long = tweet.geo.coordinates[1];
+                        longCoordinates.push(tweet_long);
+                        latCoordinates.push(tweet_lat);
+                    }
 
                     _.each(words, function (word) {
 
@@ -151,17 +170,47 @@
                 }
 
                 mostActiveUsers.sort(function(a, b) { return b.seen - a.seen;});
-                console.log(mostActiveUsers);
-                $('#users').append("<div>  " + 'Most Frequent   Users: ' + " </div>");
+                $('#users').append("<div id='head_users'>  " + 'Most Frequent Users: ' + " </div>");
                 for(var i= 0; i< 10; i++){
-                    $('#counts').append("<div>"+ "<a title='"+mostActiveUsers[i].user+"' href='http://twitter.com/"+mostActiveUsers[i].user+"'>"+mostActiveUsers[i].user+ ' ' + "</a>" + ' (' + mostActiveUsers[i].seen +')');
+                    $('#counts').append('<div id="most_active_users">'+ "<a title='"+mostActiveUsers[i].user+"' href='http://twitter.com/"+mostActiveUsers[i].user+"'>"+mostActiveUsers[i].user+ ' ' + "</a>" + ' (' + mostActiveUsers[i].seen +')');
                 }
 
                 mostUsedWords.sort(function(a, b){ return b.count - a.count;});
-                $('#counts').append("<div>  " + 'Most Frequent Words: ' + " </div>");
+                $('#counts').append("<div id='head_words'>  " + 'Most Frequent Words: ' + " </div>");
                 for(var i= 0; i< 20; i++){
-                    $('#counts').append("<div>  " + ' ' + "\t\t" + mostUsedWords[i].word +' '+'('+ mostUsedWords[i].count + ") " + " </div>");
+                    $('#counts').append('<div id="most_frequent_words">' + ' ' + "\t\t" + mostUsedWords[i].word +' '+'('+ mostUsedWords[i].count + ") " + " </div>");
                 }
+
+                /* Geo-location map*/
+                function initialize() {
+                    var mapCentre = new google.maps.LatLng(latCoordinates[0], longCoordinates[0]);
+                    var mapOptions = {
+                        zoom: 18,
+                        center: mapCentre            };
+                    var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+                    for (var i=0; i<longCoordinates.length; i++) {
+                        var marker = new google.maps.Marker({
+                            position: new google.maps.LatLng(latCoordinates[i], longCoordinates[i]),
+                            map: map,
+                            title: 'Tweet Marker'});
+                        var infowindow = new google.maps.InfoWindow({
+                            content: tweetHTMLArray[i]+latCoordinates[i]+', '+longCoordinates[i],
+                            maxWidth:200});
+                        infowindow.open(map,marker);
+                        google.maps.event.addListener(marker, 'click', function() {
+                            infowindow.open(map, marker);
+                        });
+                    }
+                }
+                if (latCoordinates.length > 0) {
+                    initialize();
+                }
+                else {
+                    $('.gm-style').remove();
+                    $('#no_locations').remove();
+                    $('#map-canvas').append("<h4 id='no_locations'> <br>Your search returned no geo-located tweets :( try again next time :) <\/h4>");
+                }
+
             },
             error: function(xhr, status, error) {
                 console.log('Error: ' + error.message);
@@ -206,6 +255,6 @@
             }
         });
 </script>
-
+</div>
 </body>
 </html>
