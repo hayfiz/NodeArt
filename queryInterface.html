@@ -1,28 +1,21 @@
-<<<<<<< HEAD
-=======
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8">
-  <title>NodeArt</title>
-  <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
-  <script src="/semantic/bower_components/jquery/dist/jquery.min.js"></script>
-  <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
- <!-- <script src="/node_modules/lodash/lodash.min.js" type="text/javascript"></script> -->
-  <script src="https://cdn.jsdelivr.net/lodash/4.6.1/lodash.min.js" type="text/javascript"></script>
-  <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXG2-B1ZOvxVuvvd-jhdi9WVPu-J2ricQ&sensor=false">
-    </script>
+    <meta charset="utf-8">
+    <title>NodeArt</title>
+    <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
+    <script src="/semantic/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/lodash/4.6.1/lodash.min.js" type="text/javascript"></script>
 </head>
 
 <body>
-  <div class="ui container">
+<div class="ui container">
     <h1 class="ui header">
-      <span class="ui image"><i class="feed icon"></i></span>
+        <span class="ui image"><i class="feed icon"></i></span>
         <div class="content">
-          Twitter Scrapper
+            Twitter Scrapper
         </div>
     </h1>
     <h2 class="ui dividing header">Query some Twitter data</h2>
@@ -32,7 +25,7 @@
       <input type="radio" name="Or" value="YES"> OR
       <br>
       <div class="field">
-        <label for="teamName"> Enter the @ of a team you would like to search for:</label>
+        <label for="Team Name"> Enter the @ of a team you would like to search for:</label>
         <input type="text" name="teamName" placeholder="@ManUtd">
         <br>
         <br>
@@ -71,165 +64,148 @@
     </form>
     <br>
     <div class="ui fluid card">
-      <div class="content">
-        <div class="header">Tweets Timeline</div>
-        <div id="counts">
-        </div>
-        <ul id="result">
+        <div class="content">
+            <div class="header">Tweets Timeline</div>
+            <div id="counts">
+                <div id="users"></div>
 
-        </ul>
-      </div>
-      
-      <div class="ui fluid card">
-      <div class="content">
-        <div class="header">Tweet locations</div>
-          <div id="map-canvas" style="width:50%;height:300pt;align:center;"/>
-           
+            </div>
+            <ul id="result">
+
+            </ul>
         </div>
-      </div>
-      <!-- for now lets make it simple -->
+<!-- for now lets make it simple -->
     </div>
 
-  </div>
+</div>
 
- <script type="text/javascript">
-        
-    </script>
-  <script>
-      function sendAjaxQuery(url, data) {
-          $('#result').html('');
-          $.ajax({
-              type: 'POST',
-              url: 'postFile.html',
-              dataType: 'json',
-              data: data,
-              success: function(tweets) {
-                  //alert('success ' + data);
-                  //var struct = JSON.parse(data); //converting to object again
-                  var latcoordinates = [];
-                  var longcoordinates = [];
-                  var tweetHTMLArray = [];
-                  var wordCounts = [];
-                  _.each(tweets,function(tweet){
-                  var date = new Date(tweet.created_at);
-                  var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
-                  var words_parse = initial_words.replace(/httpstc|RT/gi, "");
-                  var words = words_parse.split(' ');
-
-                  _.each(words,function(word) {
-                    var foundWord = _.find(wordCounts, {word: word});
-                    if (foundWord) {
-                    if (word !== "" && word !== undefined)
-                        foundWord.count += 1;
-                    } else {  // no word found
-                        wordCounts.push({word: word, count: 1});
-                    }
-
-                  });
-
-
-                  var tweetHtml = "<li>" + " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + '<br>'
-                                  +  "  Author: " + tweet.user.name + '\t\t' + ' @' + tweet.user.screen_name +'\t\t'+ ' Date: ' + moment(date).format("hh:mm ddd DD MMM YYYY") + '<br> '
-                                  + "  Tweet: " + tweet.htmlContent + //tweet.text - replace when you get an undefined error. and for server 1
-                                  (tweet.retweeted_status ? "<br>  Retweet: " + tweet.retweeted_status.user.screen_name : "") +"</li>";
-                          $('#result').append(tweetHtml); // sends the tweet object to the browser
-                          tweetHTMLArray.push(tweetHtml);
-                  if (tweet.geo != null ) {
-                    var tweetlat = tweet.geo.coordinates[0];
-                    var tweetlong = tweet.geo.coordinates[1];
-                    longcoordinates.push(tweetlong);
-                    latcoordinates.push(tweetlat);
-                    }
-                  });
-
-                  var counted;
-                  var sortedWordCounts = _.sortBy(wordCounts,function(word){ return _.take(word.count); });
-                  counted = _.take(sortedWordCounts,21);
-                  console.log(counted.sort(function (a,b) { var sorted_count = b.count - a.count
-                    return sorted_count;
-                    }));
-                    $('#most_frequent_words').remove();
-                    $('#counts').append('<div id="most_frequent_words">'+ "Most Frequent Words: " + JSON.stringify(counted,null, 4) + '</div>');
-
-                    /* Geolocation map*/
-                    function initialize() {
-                      var mapCentre = new google.maps.LatLng(latcoordinates[0], longcoordinates[0]);
-                      var mapOptions = {
-                          zoom: 18,
-                          center: mapCentre            }
-                      var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-                      for (var i=0; i<longcoordinates.length; i++) {
-                        var marker = new google.maps.Marker({
-                          position: new google.maps.LatLng(latcoordinates[i], longcoordinates[i]),
-                          map: map,
-                          title: 'Tweet Marker'});
-                      var infowindow = new google.maps.InfoWindow({
-                          content: tweetHTMLArray[i]+latcoordinates[i]+', '+longcoordinates[i],
-                          maxWidth:200});
-                      infowindow.open(map,marker);
-                      google.maps.event.addListener(marker, 'click', function() {
-                          infowindow.open(map, marker);
-                        });
-                      }
-                    }
-                    if (latcoordinates.length > 0) {
-                      initialize();
-                    }
-                    else {
-                      $('.gm-style').remove();
-                      $('#no_locations').remove();
-                      $('#map-canvas').append("<h4 id='no_locations'> <br>Your search returned no geo-located tweets :( try again next time :) </h4>");
-                    };
-                    },
-
-              error: function(xhr, status, error) {
-                  console.log('Error: ' + error.message);
-                  $('#result').append('<li>' + 'Something went wrong sorry.' + '</li>'); // error output on webpage
-                  //alert('error connecting');
-              }
-
-          });
-
-      }
-      $.fn.serializeObject = function() {
-          var o = {};
-          var a = this.serializeArray();
-          $.each(a, function() {
-              if (o[this.name] !== undefined) {
-                  if (!o[this.name].push) {
-                      o[this.name] = [o[this.name]];
-                  }
-                  o[this.name].push(this.value || '');
-              } else {
-                  o[this.name] = this.value || '';
-              }
-          });
-          return o;
-      };
-      function sendData() {
-          var form = document.getElementById('myForm');
-          sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
-      }
-      var sendButton = document.getElementById('sendButton');
-      sendButton.onclick = sendData;
-  </script>
 
 
 <script>
-  $('.ui.form')
-    .form({
-      fields: {
-        teamName: 'empty',
-        playerName : 'empty'
+    function sendAjaxQuery(url, data) {
+        $('#result').html('');
+        $.ajax({
+            type: 'POST',
+            url: 'postFile.html',
+            dataType: 'json',
+            data: data,
+            success: function (tweets) {
+
+                var wordCounts = {};
+                var userCounts = {};
+                var mostUsedWords = [];
+                var mostActiveUsers= [];
+
+                var flaggedWords = ['a', 'to', 'o', 't.co', 't', 'co', 'RT', 'https'];
+
+
+                _.each(tweets,function(tweet) {
+                    //for word frequencies
+                    var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
+                    var words_parse = initial_words.replace(/httpstc|RT/gi, "");
+                    var words = words_parse.split(' ');
+                    // for most active users
+                    var user_pattern = (/\B@[a-z0-9_-]+/gi);
+                    var user_mentions= tweet.text.match(user_pattern);
+                    console.log(user_mentions);
+                    _.each(user_mentions,function(users){ console.log(users)
+                        if (typeof userCounts[users] === 'undefined') {
+                            userCounts[users] = 1;
+                        } else {
+                            userCounts[users]++
+                        }
+                    }); //users each
+
+                    var dateReadable, date;
+                    dateReadable = new Date(Date.parse(tweet.created_at));
+                    date = dateReadable.toDateString();
+                    var tweetHtml = "<li>" + " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + '<br>'
+                            + "  Author: " + tweet.user.name + '  ' + "<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/"+ tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+ '  '+ '\t\t' + '  ' + ' Date: ' + date + '<br> '
+                            + "  Tweet: " + tweet.htmlContent +
+                            (tweet.retweeted_status ? "<br>  Retweet: " + tweet.retweeted_status.user.screen_name : "") + "</li>";
+                    $('#result').append(tweetHtml); // sends the tweet object to the browser
+
+                    _.each(words, function (word) {
+
+                        if (flaggedWords.indexOf(word) === -1 && word != '') {
+                            if (typeof wordCounts[word] === 'undefined') {
+                                wordCounts[word] = 1;
+                            } else {
+                                wordCounts[word]++
+                            }
+                        }
+
+                    }); // words each
+
+                }); //Tweet Each
+                //TODO: Link users to most used words
+                //TODO: combine the data
+
+                for( var word in wordCounts){
+                    mostUsedWords.push({word: word, count: wordCounts[word]});
+                    // quantity: wordCounts2[word]
+                }
+
+                for (var user in userCounts){
+                    mostActiveUsers.push({user: user, seen: userCounts[user]})
+                }
+
+                mostActiveUsers.sort(function(a, b) { return b.seen - a.seen;});
+                console.log(mostActiveUsers);
+                $('#users').append("<div>  " + 'Most Frequent   Users: ' + " </div>");
+                for(var i= 0; i< 10; i++){
+                    $('#counts').append("<div>"+ "<a title='"+mostActiveUsers[i].user+"' href='http://twitter.com/"+mostActiveUsers[i].user+"'>"+mostActiveUsers[i].user+ ' ' + "</a>" + ' (' + mostActiveUsers[i].seen +')');
+                }
+
+                mostUsedWords.sort(function(a, b){ return b.count - a.count;});
+                $('#counts').append("<div>  " + 'Most Frequent Words: ' + " </div>");
+                for(var i= 0; i< 20; i++){
+                    $('#counts').append("<div>  " + ' ' + "\t\t" + mostUsedWords[i].word +' '+'('+ mostUsedWords[i].count + ") " + " </div>");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Error: ' + error.message);
+                $('#result').append('<li>' + 'Something went wrong sorry.' + '</li>'); // error output on webpage
+                //alert('error connecting');
+            }
+        });
 
     }
-    
-});
+    $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name] !== undefined) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+
+    function sendData() {
+        var form = document.getElementById('myForm');
+        sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
+    }
+    var sendButton = document.getElementById('sendButton');
+    sendButton.onclick = sendData;
+</script>
+
+
+<script>
+    $('.ui.form')
+        .form({
+            fields: {
+                teamName: 'empty',
+                playerName : 'empty'
+
+            }
+        });
 </script>
 
 </body>
-<!-- + " <img class='"ui avatar image"' src=' "+ tweet.user.profile_image_url + "'>" -->
-<!--- tweet.htmlContent -->
-
 </html>
->>>>>>> 1f40b7c4318277cbf778dd7f18c45ba75a6e3e00
