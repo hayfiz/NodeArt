@@ -20,7 +20,10 @@ var app = http.createServer(function(req, res) {
 
   function prepareTweets(input) {
     input.forEach(function(current) {
+      current.authorContent = twitter.autoLink(twitter.htmlEscape(current.user.screen_name));
+      current.userContent = twitter.autoLink(twitter.htmlEscape(current.user.name));
       current.htmlContent = twitter.autoLink(twitter.htmlEscape(current.text));
+
     });
   }
 
@@ -49,6 +52,7 @@ var app = http.createServer(function(req, res) {
     req.on('end', function() {
       var queryContent = JSON.parse(body);
       console.log(queryContent);
+
       var queryString = '';
       var queryStringElements = [];
       var queryOperator = queryContent.Or;
@@ -100,7 +104,7 @@ var app = http.createServer(function(req, res) {
            in order to gain access to authored tweets */
         client.get('search/tweets', {
           q: queryString,
-          count: 10
+          count: 10 //i reduced this because of the limit thingy
         }, function(err, res) {
           cb(err, res && res.statuses);
         });
