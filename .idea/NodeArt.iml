@@ -7,6 +7,7 @@
     <orderEntry type="library" name="moment" level="application" />
     <orderEntry type="library" name="lodash" level="application" />
     <orderEntry type="library" name="moment" level="application" />
+    <orderEntry type="library" name="NodeArt node_modules" level="project" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_FOLDERS">

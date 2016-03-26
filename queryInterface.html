@@ -8,8 +8,9 @@
     <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/lodash/4.6.1/lodash.min.js" type="text/javascript"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXG2-B1ZOvxVuvvd-jhdi9WVPu-J2ricQ&amp;sensor=false">
-    </script>
+    <!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXG2-B1ZOvxVuvvd-jhdi9WVPu-J2ricQ&amp;sensor=false">-->
+    <!--</script>-->
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyB0mU4ILaXvry-r7nQ3xnziVmCM_AkbCYM"></script>
 </head>
 
 <body>
@@ -22,47 +23,47 @@
     </h1>
     <h2 class="ui dividing header">Query some Twitter data</h2>
     <form class="ui form" id="myForm" onsubmit="return false;">
-      <input type="radio" name="Or" value="No"> AND
-      <br>
-      <input type="radio" name="Or" value="YES"> OR
-      <br>
-      <div class="field">
-        <label for="Team Name"> Enter the @ of a team you would like to search for:</label>
-        <input type="text" name="teamName" placeholder="@ManUtd">
+        <input type="radio" name="Or" value="No"> AND
         <br>
+        <input type="radio" name="Or" value="YES"> OR
         <br>
-        <div class="ui-checkbox">
-          <input type="checkbox" name="TeamAut" value="YES">
-          <label> Author</label>
+        <div class="field">
+            <label> Enter the @ of a team you would like to search for:</label>
+            <input type="text" name="teamName" placeholder="@ManUtd">
+            <br>
+            <br>
+            <div class="ui-checkbox">
+                <input type="checkbox" name="TeamAut" value="YES">
+                <label> Author</label>
+            </div>
+            <div class="ui-checkbox">
+                <input type="checkbox" name="TeamMen" value="YES">
+                <label> Mentions</label>
+            </div>
         </div>
-        <div class="ui-checkbox">
-          <input type="checkbox" name="TeamMen" value="YES">
-          <label> Mentions</label>
+        <div class="field">
+            <label>Enter the @ of a player you'd like to find:</label>
+            <input type="text" name="playerName" placeholder="@WayneRooney">
+            <br>
+            <br>
+            <div class="ui-checkbox">
+                <input type="checkbox" name="PlayerAut" value="YES">
+                <label> Author</label>
+            </div>
+            <div class="ui-checkbox">
+                <input type="checkbox" name="PlayerMen" value="YES">
+                <label> Mentions</label>
+            </div>
         </div>
-      </div>
-      <div class="field">
-        <label for="playerName">Enter the @ of a player you'd like to find:</label>
-        <input type="text" name="playerName" placeholder="@WayneRooney">
-        <br>
-        <br>
-        <div class="ui-checkbox">
-          <input type="checkbox" name="PlayerAut" value="YES">
-          <label> Author</label>
+        <div class="field">
+            <label>Enter any related hashtags:</label>
+            <input type="text" name="hashtag" placeholder="#Research">
         </div>
-        <div class="ui-checkbox">
-          <input type="checkbox" name="PlayerMen" value="YES">
-          <label> Mentions</label>
+        <div class="field">
+            <label>Enter any specific keywords:</label>
+            <input type="text" name="keywords" placeholder=" ">
         </div>
-      </div>
-      <div class="field">
-        <label for="hashtag">Enter any related hashtags:</label>
-        <input type="text" name="hashtag" placeholder="#Research">
-      </div>
-      <div class="field">
-        <label for="keywords">Enter any specific keywords:</label>
-        <input type="text" name="keywords" placeholder=" ">
-      </div>
-      <button class="ui button" id="sendButton">Query Data</button>
+        <button class="ui button" id="sendButton">Query Data</button>
     </form>
     <br>
     <div class="ui fluid card">
@@ -72,189 +73,290 @@
                 <div id="users"></div>
 
             </div>
+            <div id="count_result">
+
+
+            </div>
             <ul id="result">
 
             </ul>
         </div>
-<!-- for now lets make it simple -->
+        <!-- for now lets make it simple -->
     </div>
     <div class="ui fluid card">
         <div class="content">
             <div class="header">Tweet locations</div>
-            <div id="map-canvas" style="width:50%;height:300pt;align:center;"></div>
+            <div id="map-canvas" style="width:100%;height:300pt;align:center;"></div>
         </div>
     </div>
 
-<script>
-    function sendAjaxQuery(url, data) {
-        $('#result').html('');
-        $.ajax({
-            type: 'POST',
-            url: 'postFile.html',
-            dataType: 'json',
-            data: data,
-            success: function (tweets) {
+    <script>
+        function sendAjaxQuery(url, data) {
+            $('#result').html('');
+            $.ajax({
+                type: 'POST',
+                url: 'postFile.html',
+                dataType: 'json',
+                data: data,
+                success: function (tweets) {
 
-                // maps
-                var latCoordinates = [];
-                var longCoordinates = [];
-                var tweetHTMLArray = [];
-
-                //words and users
-                var wordCounts = {};
-                var userCounts = {};
-                var mostUsedWords = [];
-                var mostActiveUsers= [];
-
-                var flaggedWords = ['a', 'to', 'o', 't.co', 't', 'co', 'RT', 'https'];
-
-
-                _.each(tweets,function(tweet) {
-                    //for word frequencies
-                    var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
-                    var words_parse = initial_words.replace(/httpstc|RT/gi, "");
-                    var words = words_parse.split(' ');
-                    // for most active users
-                    var user_pattern = (/\B@[a-z0-9_-]+/gi);
-                    var user_mentions= tweet.text.match(user_pattern);
-                    console.log(user_mentions);
-                    _.each(user_mentions,function(users){ console.log(users)
-                        if (typeof userCounts[users] === 'undefined') {
-                            userCounts[users] = 1;
-                        } else {
-                            userCounts[users]++
-                        }
-                    }); //users each
-
-                    var dateReadable, date;
-                    dateReadable = new Date(Date.parse(tweet.created_at));
-                    date = dateReadable.toDateString();
-                    var tweetHtml = "<li>" + " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + '<br>'
-                            + "  Author: " + tweet.user.name + '  ' + "<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/"+ tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+ '  '+ '\t\t' + '  ' + ' Date: ' + date + '<br> '
-                            + "  Tweet: " + tweet.htmlContent +
-                            (tweet.retweeted_status ? "<br>  Retweet: " + tweet.retweeted_status.user.screen_name : "") + "</li>";
-                    $('#result').append(tweetHtml); // sends the tweet object to the browser
-                    $('#most_frequent_words').remove();
                     // maps
-                    tweetHTMLArray.push(tweetHtml);
-                    if (tweet.geo != null ) {
-                        var tweet_lat = tweet.geo.coordinates[0];
-                        var tweet_long = tweet.geo.coordinates[1];
-                        longCoordinates.push(tweet_long);
-                        latCoordinates.push(tweet_lat);
-                    }
+                    var latCoordinates = [];
+                    var longCoordinates = [];
+                    var tweetHTMLArray = [];
+                    var tweets_A = [];
+                    var info_=[];
 
-                    _.each(words, function (word) {
+                    //words and users
+                    var wordCounts = {};
+                    var userCounts = {};
+                    var mostUsedWords = [];
+                    var mostActiveUsers= [];
 
-                        if (flaggedWords.indexOf(word) === -1 && word != '') {
-                            if (typeof wordCounts[word] === 'undefined') {
-                                wordCounts[word] = 1;
+                    var flaggedWords = ['a', 'to', 'o', 't.co', 't', 'co', 'or','RT', 'https','so','for', 'the', 'and', 'this', 'of', 'i', 'I' ,'1','2',
+                    '3','4','5','6','7','8','9','0'];
+
+
+                    _.each(tweets,function(tweet) {
+
+                        //for word frequencies
+                        var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
+                        var words_parse = initial_words.replace(/httpstc|RT/gi, "");
+                        var words = words_parse.split(' ');
+                        tweets_A.push(tweet.text);
+
+                        // for most active users
+                        var user_pattern = (/\B@[a-z0-9_-]+/gi);
+                        var user_mentions= tweet.text.match(user_pattern);
+                        _.each(user_mentions,function(users){ //console.log(users)
+                            if (typeof userCounts[users] === 'undefined') {
+                                userCounts[users] = 1;
                             } else {
-                                wordCounts[word]++
+                                userCounts[users]++
                             }
+                        }); //users each
+
+                        var dateReadable, date;
+                        dateReadable = new Date(Date.parse(tweet.created_at));
+                        date = dateReadable.toDateString();
+                        var tweetHtml = "<li>" + " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + '<br>'
+                                + "  Author: " + tweet.user.name + '&nbsp;' + "<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/"+ tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+ '&nbsp;'+ '\t\t' + '&nbsp;' + ' Date: ' + date + '<br> '
+                                + "  Tweet: " + tweet.htmlContent +
+                                (tweet.retweeted_status ? "<br>  Retweet: " +'@'+ tweet.retweeted_status.user.screen_name : "") + "</li>";
+                        $('#result').append(tweetHtml); // sends the tweet object to the browser
+                        $('#most_frequent_words').remove();
+                        // maps
+                        tweetHTMLArray.push(tweetHtml);
+                        if (tweet.geo != null ) {
+                            var tweet_lat = tweet.geo.coordinates[0];
+                            var tweet_long = tweet.geo.coordinates[1];
+                            longCoordinates.push(tweet_long);
+                            latCoordinates.push(tweet_lat);
                         }
 
-                    }); // words each
+                        _.each(words, function (word) {
 
-                }); //Tweet Each
-                //TODO: Link users to most used words
-                //TODO: combine the data
+                            if (flaggedWords.indexOf(word) === -1 && word != '') {
+                                if (typeof wordCounts[word] === 'undefined') {
+                                    wordCounts[word] = 1;
+                                } else {
+                                    wordCounts[word]++
+                                }
+                            }
 
-                for( var word in wordCounts){
-                    mostUsedWords.push({word: word, count: wordCounts[word]});
-                    // quantity: wordCounts2[word]
-                }
+                        }); // words each
 
-                for (var user in userCounts){
-                    mostActiveUsers.push({user: user, seen: userCounts[user]})
-                }
+                    }); //Tweet Each
 
-                mostActiveUsers.sort(function(a, b) { return b.seen - a.seen;});
-                $('#users').append("<div id='head_users'>  " + 'Most Frequent Users: ' + " </div>");
-                for(var i= 0; i< 10; i++){
-                    $('#counts').append('<div id="most_active_users">'+ "<a title='"+mostActiveUsers[i].user+"' href='http://twitter.com/"+mostActiveUsers[i].user+"'>"+mostActiveUsers[i].user+ ' ' + "</a>" + ' (' + mostActiveUsers[i].seen +')');
-                }
-
-                mostUsedWords.sort(function(a, b){ return b.count - a.count;});
-                $('#counts').append("<div id='head_words'>  " + 'Most Frequent Words: ' + " </div>");
-                for(var i= 0; i< 20; i++){
-                    $('#counts').append('<div id="most_frequent_words">' + ' ' + "\t\t" + mostUsedWords[i].word +' '+'('+ mostUsedWords[i].count + ") " + " </div>");
-                }
-
-                /* Geo-location map*/
-                function initialize() {
-                    var mapCentre = new google.maps.LatLng(latCoordinates[0], longCoordinates[0]);
-                    var mapOptions = {
-                        zoom: 18,
-                        center: mapCentre            };
-                    var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-                    for (var i=0; i<longCoordinates.length; i++) {
-                        var marker = new google.maps.Marker({
-                            position: new google.maps.LatLng(latCoordinates[i], longCoordinates[i]),
-                            map: map,
-                            title: 'Tweet Marker'});
-                        var infowindow = new google.maps.InfoWindow({
-                            content: tweetHTMLArray[i]+latCoordinates[i]+', '+longCoordinates[i],
-                            maxWidth:200});
-                        infowindow.open(map,marker);
-                        google.maps.event.addListener(marker, 'click', function() {
-                            infowindow.open(map, marker);
-                        });
+                    for( var word in wordCounts){
+                        mostUsedWords.push({word: word, count: wordCounts[word]});
+                        // quantity: wordCounts2[word]
                     }
+
+                    for (var user in userCounts){
+                        mostActiveUsers.push({user: user, seen: userCounts[user]})
+                    }
+
+                    mostActiveUsers.sort(function(a, b) { return b.seen - a.seen;});
+                    //$('#users').append("<div id='head_users'>  " + 'Most Frequent Users: ' + " </div>");
+
+                    $('#counts').html('');
+                    for(var i= 0; i< 10; i++){
+                        if (mostActiveUsers[i]){
+                            $('#counts').append('<div id="most_active_users">' +
+                                    "<a title='" + mostActiveUsers[i].user + "' href='http://twitter.com/" +
+                                    mostActiveUsers[i].user + "'>" + mostActiveUsers[i].user + '&nbsp;' +
+                                    "</a>" + 'count =  (' + mostActiveUsers[i].seen + ')');
+                        }
+                    }
+
+                    var finalArray = [];
+
+                    mostUsedWords.sort(function(a, b){ return b.count - a.count;});
+                    // $('#counts').append("<div id='head_words'>  " + 'Most Frequent Words: ' + " </div>");
+                    for(var i= 0; i< 20; i++){
+                        if (mostUsedWords[i]) {
+                            //  console.info(mostUsedWords[i]);
+                            $('#counts').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" + mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") " + " </div>");
+                        }
+                    }
+
+
+                    function activeUserAndKeywords(tweets_A, mostActiveUsers, mostUsedWords){
+                        var tweet_counter = 0;  //for counting the tweets user is found in
+                        var word_counter = 0; //for counting the words in the tweets
+
+                        _.each(mostActiveUsers, function (user) {
+                        var temp_tweetCounter =0;
+                        console.log("--> MostActiveUser = "+ user.user);
+                        var activeUser = new RegExp(user.user);
+                            var temp_info = {
+                                author: {
+                                    screen_name: user.user,
+                                    temp_tweetSeen : user.seen,
+                                    words : []
+                                }
+                            };
+                            //   var tempArray = [];
+                            _.each(tweets_A, function(tweet) {
+                                if (activeUser.test(tweet)) {
+                                    tweet_counter++;
+                                    temp_tweetCounter++;
+
+                                    var temp_wordCount =0;
+                                    _.each(mostUsedWords, function(word) {
+                                        temp_wordCount++;
+                                        if(temp_wordCount >=10)
+                                            return;
+                                        if (tweet.indexOf(word.word) >= 0){
+                                            word_counter++;
+//                                            var info = {
+//                                                author: {
+//                                                    screen_name: user.user,
+//                                                    tweet_counts: tweet_counter,
+//                                                    words: {word : word.word, count : word.count}
+//                                                }
+//                                            };
+                                            temp_info.author.words.push({word : word.word , count : word.count});
+
+//                                            info_.push(info);
+
+                                            //console.log('Author: '+ user.user + " " + 'Tweets: ' + '('+tweet_counter+')' + ' Most frequent words: '
+                                            //      + word.word + '('+ word.count+')');
+                                        } else{
+                                            return word.word + " is NOT in tweet.";
+                                        }
+                                    });
+
+
+                                } else {
+                                    return user.user + " is NOT in tweet.";
+                                }
+                            });
+                            temp_info.author.tweet_counts = temp_tweetCounter;
+                            //  tempArray.push(temp_info);
+                            finalArray.push({ user : user.user,
+                                data: temp_info});
+                        });
+                        // console.log("final Array Output: ")
+                        // console.log(JSON.stringify(finalArray));
+
+                    }
+                    activeUserAndKeywords(tweets_A, mostActiveUsers, mostUsedWords);
+
+//                    info_.sort(function(a, b){ return b.tweets - a.tweets;});
+//                    $('#count_result').append("<div id='head_words'>  " + 'Active Users and Words: ' + " </div>");
+//                    for(var i= 0; i< 10; i++){
+//                        if (info_[i]) {
+//                            console.info(info_[i]);
+//                            $('#count_result').append('<div>' + " <img class='ui avatar image'  src='https://twitter.com/"+info_[i].author.screen_name+"/profile_image?size=original'>" + '&nbsp;' + 'Author: '+  ' ' + "<a title='"+ info_[i].author.screen_name+"' href='http://twitter.com/"+info_[i].author.screen_name+"'>"+info_[i].author.screen_name+ "</a>"+ '&nbsp;&nbsp;  '+ '  ' + '  '+
+//                                    'Tweets: ' + info_[i].author.tweet_counts + ' &nbsp;' + '&nbsp;' + 'Most Frequent Words: ' + info_[i].author.words.word + '&nbsp;' + '  ' + '('+info_[i].author.words.count+')'+" </div>");
+//                        }
+//                    }
+
+                    $('#count_result').append("<div id='head_words'>  " + 'Active Users and Words: ' + " </div>");
+                    for(var i= 0; i< 10; i++){
+                        if (finalArray[i]) {
+                            console.info(JSON.stringify(finalArray[i]));
+                            $('#count_result').append("<div>" + " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name + "' href='http://twitter.com/" + finalArray[i].data.author.screen_name + "'>" + finalArray[i].data.author.screen_name + "</a>" + '&nbsp;&nbsp;  ' + '  ' + '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +'&nbsp;' + 'Most Frequent Words: ' + "</div>");
+
+//                            var l=0;
+//                            for(l=0;l<finalArray[i].data.author.words.length ; l++){
+                           var sortedArray =  _.sortBy(_.uniqBy(finalArray[i].data.author.words, 'word'), ['word', 'count']);
+                            _.each(_.take(sortedArray,10), function (word) {
+                                console.log(word);
+                                $('#count_result').append('<div>'+' &nbsp;' + '&nbsp;' + word.word + '&nbsp;' + '  ' + '(' + word.count + ')'+" </div>");
+                        //}
+                                });
+                        }
+
+                    }
+
+                    /* Geo-location map*/
+                    function initialize() {
+                        var mapCentre = new google.maps.LatLng(latCoordinates[0], longCoordinates[0]);
+                        var mapOptions = {
+                            zoom: 18,
+                            center: mapCentre            };
+                        var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+                        for (var i=0; i<longCoordinates.length; i++) {
+                            var marker = new google.maps.Marker({
+                                position: new google.maps.LatLng(latCoordinates[i], longCoordinates[i]),
+                                map: map,
+                                title: 'Tweet Marker'});
+                            var infowindow = new google.maps.InfoWindow({
+                                content: tweetHTMLArray[i]+latCoordinates[i]+', '+longCoordinates[i],
+                                maxWidth:200});
+                            infowindow.open(map,marker);
+                            google.maps.event.addListener(marker, 'click', function() {
+                                infowindow.open(map, marker);
+                            });
+                        }
+                    }
+                    if (latCoordinates.length > 0) {
+                        initialize();
+                    }
+                    else {
+                        $('.gm-style').remove();
+                        $('#no_locations').remove();
+                        $('#map-canvas').append("<h4 id='no_locations'> <br>Your search returned no geo-located tweets :( try again next time :) <\/h4>");
+                    }
+
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error: ' + error.message);
+                    $('#result').append('<li>' + 'Something went wrong sorry.' + '</li>'); // error output on webpage
+                    //alert('error connecting');
                 }
-                if (latCoordinates.length > 0) {
-                    initialize();
+            });
+
+        }
+        $.fn.serializeObject = function() {
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function() {
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
                 }
-                else {
-                    $('.gm-style').remove();
-                    $('#no_locations').remove();
-                    $('#map-canvas').append("<h4 id='no_locations'> <br>Your search returned no geo-located tweets :( try again next time :) <\/h4>");
-                }
+            });
+            return o;
+        };
 
-            },
-            error: function(xhr, status, error) {
-                console.log('Error: ' + error.message);
-                $('#result').append('<li>' + 'Something went wrong sorry.' + '</li>'); // error output on webpage
-                //alert('error connecting');
-            }
-        });
-
-    }
-    $.fn.serializeObject = function() {
-        var o = {};
-        var a = this.serializeArray();
-        $.each(a, function() {
-            if (o[this.name] !== undefined) {
-                if (!o[this.name].push) {
-                    o[this.name] = [o[this.name]];
-                }
-                o[this.name].push(this.value || '');
-            } else {
-                o[this.name] = this.value || '';
-            }
-        });
-        return o;
-    };
-
-    function sendData() {
-        var form = document.getElementById('myForm');
-        sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
-    }
-    var sendButton = document.getElementById('sendButton');
-    sendButton.onclick = sendData;
-</script>
-
-
-<script>
-    $('.ui.form')
-        .form({
-            fields: {
-                teamName: 'empty',
-                playerName : 'empty'
-
-            }
-        });
-</script>
+        function sendData() {
+            $('#most_active_users').html('');
+            $('#most_frequent_words').html('');
+            $('#count_result').html('');
+            var form = document.getElementById('myForm');
+            sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
+        }
+        var sendButton = document.getElementById('sendButton');
+        sendButton.onclick = sendData;
+    </script>
 </div>
 </body>
 </html>
