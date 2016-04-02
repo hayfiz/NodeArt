@@ -11,6 +11,12 @@ var client = new Twit({
     access_token: '1519284373-PAvCS78UF0CoOcdnnz1p35OYYjIUnWQ6Tsi2iM6',
     access_token_secret: 'o8PdyK3uXrCVW0Orh6AP8maBB0S93sbvmI4Kbs1jzmTVd'
 });
+var mongojs = require('mongojs');
+
+//db
+var dburl = 'localhost/nodeart';
+var collections = ['queries'];
+var db = mongojs(dburl, collections);
 
 
 var file = new(static.Server)();
@@ -60,6 +66,7 @@ var app = http.createServer(function(req, res) {
             var queryTeamMentionedTweets = queryContent.TeamMen;
             var queryPlayerAuthoredTweets = queryContent.PlayerAut;
             var queryPlayerMentionedTweets = queryContent.PlayerMen;
+            var querytype = 0;
             delete queryContent.TeamAut;
             delete queryContent.TeamMen;
             delete queryContent.PlayerAut;
@@ -120,6 +127,7 @@ var app = http.createServer(function(req, res) {
                 var complete = 0;
                 var errors = [];
                 var finalTweets = [];
+                var queryArray = [searchQueryString, teamName+''+playerName,teamName, playerName];
 
                 function done(err, tweets) {
                     if (err) {
@@ -133,7 +141,7 @@ var app = http.createServer(function(req, res) {
                         } else {
                             err = null;
                         }
-                        cb(err, finalTweets);
+                        cb(err, queryArray[querytype],finalTweets);
                     }
                 }
 
@@ -152,17 +160,79 @@ var app = http.createServer(function(req, res) {
                 }
             }
 
-            function receivedTweets(err, tweets) {
+            function receivedTweets(err, queryString,tweets) {
                 if (err) {
                     console.log(err);
                     return sendJsonResponse({
                         error: "There was an error: " + err
                     }, false);
                 }
-                console.log(tweets);
-                sendJsonResponse(tweets);
+                db_entry = {};
+                db_entry.query = queryString;
+                db_entry.queryOperator = queryOperator;
+                db_entry.queryTeamAuthoredTweets = queryTeamAuthoredTweets;
+                db_entry.queryTeamMentionedTweets = queryTeamMentionedTweets;
+                db_entry.queryPlayerAuthoredTweets = queryPlayerAuthoredTweets;
+                db_entry.queryPlayerMentionedTweets = queryPlayerMentionedTweets;
+                db_entry.tweets = tweets;
+                db.queries.find({
+                    query: queryString,
+                    queryOperator: queryOperator, 
+                    queryTeamAuthoredTweets: queryTeamAuthoredTweets, 
+                    queryTeamMentionedTweets: queryTeamMentionedTweets,
+                    queryPlayerAuthoredTweets: queryPlayerAuthoredTweets,
+                    queryPlayerMentionedTweets: queryPlayerMentionedTweets
+                }, function(err, foundQuery) {
+                    if (err) {console.log("Query not found because of error " + err); }
+                    else if (foundQuery.length < 1) {
+                       db.queries.save(db_entry, function(err, cachedTweets) {
+                                if (err||!cachedTweets) {
+                                    console.log("Tweets not saved because of error " + err);
+                                }
+                                else {
+                                    console.log(db_entry.query);
+                                    sendJsonResponse(tweets);
+                                }
+                            }); 
+                    }
+                    else  { 
+                        tweetsx = foundQuery[0].tweets
+                        retrieved_count = tweetsx.length
+                        added_count = 0;
+                        for (tweet in tweets) {
+                            if (Date.parse(tweets[tweet].created_at) > Date.parse(tweetsx[0].created_at)) {
+                                
+                                db.queries.update({
+                    query: queryString,
+                    queryOperator: queryOperator, 
+                    queryTeamAuthoredTweets: queryTeamAuthoredTweets, 
+                    queryTeamMentionedTweets: queryTeamMentionedTweets,
+                    queryPlayerAuthoredTweets: queryPlayerAuthoredTweets,
+                    queryPlayerMentionedTweets: queryPlayerMentionedTweets
+                }, {$push: { tweets: tweets[tweet] } }), function(err, addedTweet) {
+                                    if (err||!addedTweet) {
+                                        console.log(err);
+                                    }
+                                    else {
+                                        console.log('added tweet')
+                                    }
+                                }
+                                tweetsx.unshift(tweets[tweet]);
+                                added_count++;
+                            }
+                        }
+                        //console.log(tweetsx[0]);
+                        console.log('Results returned by the database: '+retrieved_count);
+                        console.log('New tweets stored into database: '+added_count);
+                        //console.log(foundQuery[0].tweets);
+                        sendJsonResponse(tweetsx);
+                        
+                    };
+                }); 
+                
+                
             }
-
+            
             /*The if statements below check for the different cases possible with the queries*/
             if ((teamAutAndMention && playerAutAndMention) ||
                 ((queryTeamAuthoredTweets === 'YES') && playerAutAndMention) ||
@@ -174,14 +244,17 @@ var app = http.createServer(function(req, res) {
             } else if (playerAutAndMention) {
                 getTweets(queryString, null, queryContent.playerName, receivedTweets);
             } else if ((queryOperator === 'YES') && (queryTeamAuthoredTweets === 'YES') && (queryPlayerAuthoredTweets === 'YES')) {
-                getTweets(null, queryContent.teamName, queryContent.playerName, receivedTweets);
+                querytype = 1;
+                getTweets(null, queryContent.teamName, queryContent.playerName, receivedTweets);   
             } else if ((queryTeamAuthoredTweets === 'YES') && (queryOperator === 'YES')) {
                 getTweets(queryString, queryContent.teamName, null, receivedTweets);
             } else if ((queryPlayerAuthoredTweets === 'YES') && (queryOperator === 'YES')) {
                 getTweets(queryString, null, queryContent.playerName, receivedTweets);
             } else if (queryTeamAuthoredTweets === 'YES') {
+                querytype = 2;
                 getTweets(null, queryContent.teamName, null, receivedTweets);
             } else if (queryPlayerAuthoredTweets === 'YES') {
+                querytype = 3;
                 getTweets(null, null, queryContent.playerName, receivedTweets);
             } else {
                 getTweets(queryString, null, null, receivedTweets);
