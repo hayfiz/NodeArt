@@ -63,7 +63,13 @@
             <label>Enter any specific keywords:</label>
             <input type="text" name="keywords" placeholder=" ">
         </div>
-        <button class="ui button" id="sendButton">Query Data</button>
+        <span><button class="ui button" id="sendButton">Query Data</button>
+            <br>
+            <br>
+            <div class="ui-checkbox">
+                <input type="checkbox" name="dbQuery" value="YES">
+                <label> Query Database Only</label>
+            </div>
     </form>
     <br>
     <div class="ui fluid card">
@@ -77,6 +83,7 @@
 
 
             </div>
+            <span id="db_info"> </span>
             <ul id="result">
 
             </ul>
@@ -99,6 +106,8 @@
                 dataType: 'json',
                 data: data,
                 success: function (tweets) {
+                    console.log(tweets);
+                    console.log(tweets[0]);
 
                     // maps
                     var latCoordinates = [];
@@ -116,8 +125,18 @@
                     var flaggedWords = ['a', 'to', 'o', 't.co', 't', 'co', 'or','RT', 'https','so','for', 'the', 'and', 'this', 'of', 'i', 'I' ,'1','2',
                     '3','4','5','6','7','8','9','0'];
 
+//                    console.log( 'Results returned by the database: ' +  tweets[1].count+ ' ' +
+//                                 'New tweets stored into database: ' + tweets[1].added);
 
-                    _.each(tweets,function(tweet) {
+                    if(tweets.length > 1){
+                        var counts_db = '<div>' + 'Results returned by the database: ' +  tweets[1].count+ '<br>' + ' ' +
+                                'New tweets stored into database: ' + tweets[1].added + '<br>' + 'Tweets Updated from the API: ' + tweets[1].added + '</div>';
+                        $('#db_info').append(counts_db);
+                    } else {
+                        $('#db_info').append('Tweets from the API added');
+                    }
+
+                    _.each(tweets[0],function(tweet) {
 
                         //for word frequencies
                         var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
@@ -135,7 +154,6 @@
                                 userCounts[users]++
                             }
                         }); //users each
-
                         var dateReadable, date;
                         dateReadable = new Date(Date.parse(tweet.created_at));
                         date = dateReadable.toDateString();
@@ -208,7 +226,6 @@
 
                         _.each(mostActiveUsers, function (user) {
                         var temp_tweetCounter =0;
-                        console.log("--> MostActiveUser = "+ user.user);
                         var activeUser = new RegExp(user.user);
                             var temp_info = {
                                 author: {
@@ -277,14 +294,14 @@
                     $('#count_result').append("<div id='head_words'>  " + 'Active Users and Words: ' + " </div>");
                     for(var i= 0; i< 10; i++){
                         if (finalArray[i]) {
-                            console.info(JSON.stringify(finalArray[i]));
+                          //  console.info(JSON.stringify(finalArray[i]));
                             $('#count_result').append("<div>" + " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name + "' href='http://twitter.com/" + finalArray[i].data.author.screen_name + "'>" + finalArray[i].data.author.screen_name + "</a>" + '&nbsp;&nbsp;  ' + '  ' + '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +'&nbsp;' + 'Most Frequent Words: ' + "</div>");
 
 //                            var l=0;
 //                            for(l=0;l<finalArray[i].data.author.words.length ; l++){
-                           var sortedArray =  _.sortBy(_.uniqBy(finalArray[i].data.author.words, 'word'), ['word', 'count']);
-                            _.each(_.take(sortedArray,10), function (word) {
-                                console.log(word);
+                           var sortedArray = _.sortBy(_.uniqBy(finalArray[i].data.author.words, 'word'), ['count', 'word']);
+                            _.eachRight(_.take(sortedArray,10), function (word) {
+                               // console.log(word);
                                 $('#count_result').append('<div>'+' &nbsp;' + '&nbsp;' + word.word + '&nbsp;' + '  ' + '(' + word.count + ')'+" </div>");
                         //}
                                 });
@@ -348,9 +365,7 @@
         };
 
         function sendData() {
-            $('#most_active_users').html('');
-            $('#most_frequent_words').html('');
-            $('#count_result').html('');
+            $('#most_active_users').html(''); $('#most_frequent_words').html(''); $('#count_result').html('');
             var form = document.getElementById('myForm');
             sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
         }

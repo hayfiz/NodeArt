@@ -5,13 +5,14 @@ var url = require('url');
 var querystring = require('querystring');
 var Twit = require('twit');
 var twitter = require('twitter-text');
+var mongojs = require('mongojs');
 var client = new Twit({
     consumer_key: 'o19ZQHXFRvb16vRdlhiKRR4UZ',
     consumer_secret: 'BaZMfCaBKcSLHTC7gwupjIOHBlq587ZnpU6VnFEEnoAlWsCkKW',
     access_token: '1519284373-PAvCS78UF0CoOcdnnz1p35OYYjIUnWQ6Tsi2iM6',
     access_token_secret: 'o8PdyK3uXrCVW0Orh6AP8maBB0S93sbvmI4Kbs1jzmTVd'
 });
-var mongojs = require('mongojs');
+
 
 //db
 var dburl = 'localhost/nodeart';
@@ -25,9 +26,9 @@ var app = http.createServer(function(req, res) {
     var pathname = url.parse(req.url).pathname;
 
     function prepareTweets(input) {
-        input.forEach(function(current) {
-            current.authorContent = twitter.autoLink(twitter.htmlEscape(current.user.screen_name));
-            current.userContent = twitter.autoLink(twitter.htmlEscape(current.user.name));
+        input[0].forEach(function(current) {
+            //current.authorContent = twitter.autoLink(twitter.htmlEscape(current.user.screen_name));
+           // current.userContent = twitter.autoLink(twitter.htmlEscape(current.user.name));
             current.htmlContent = twitter.autoLink(twitter.htmlEscape(current.text));
 
         });
@@ -61,17 +62,21 @@ var app = http.createServer(function(req, res) {
 
             var queryString = '';
             var queryStringElements = [];
+            var databaseObjects = [];
+            var tweetObjects = [];
             var queryOperator = queryContent.Or;
             var queryTeamAuthoredTweets = queryContent.TeamAut;
             var queryTeamMentionedTweets = queryContent.TeamMen;
             var queryPlayerAuthoredTweets = queryContent.PlayerAut;
             var queryPlayerMentionedTweets = queryContent.PlayerMen;
+            var querydb = queryContent.dbQuery;
             var querytype = 0;
             delete queryContent.TeamAut;
             delete queryContent.TeamMen;
             delete queryContent.PlayerAut;
             delete queryContent.PlayerMen;
             delete queryContent.Or;
+            delete queryContent.dbQuery;
 
             //so we are now sending an answer to the ajax request with res.write,
             // we are writing a json string that represents the array of tweets.
@@ -191,14 +196,13 @@ var app = http.createServer(function(req, res) {
                                 }
                                 else {
                                     console.log(db_entry.query);
-                                    sendJsonResponse(tweets);
                                 }
                             }); 
                     }
-                    else  { 
-                        tweetsx = foundQuery[0].tweets
-                        retrieved_count = tweetsx.length
-                        added_count = 0;
+                    else  {
+                        var tweetsx = foundQuery[0].tweets;
+                        var retrieved_count = tweetsx.length;
+                        var added_count = 0;
                         for (tweet in tweets) {
                             if (Date.parse(tweets[tweet].created_at) > Date.parse(tweetsx[0].created_at)) {
                                 
@@ -216,20 +220,30 @@ var app = http.createServer(function(req, res) {
                                     else {
                                         console.log('added tweet')
                                     }
-                                }
+                                };
                                 tweetsx.unshift(tweets[tweet]);
                                 added_count++;
                             }
                         }
-                        //console.log(tweetsx[0]);
+                        console.log("------->>>>");
                         console.log('Results returned by the database: '+retrieved_count);
                         console.log('New tweets stored into database: '+added_count);
-                        //console.log(foundQuery[0].tweets);
-                        sendJsonResponse(tweetsx);
+                        databaseObjects.push(tweetsx, {count : retrieved_count , added: added_count });
+                        tweetObjects.push(tweets);
+                        if (querydb) {
+
+                            sendJsonResponse(databaseObjects);
+                            //sendJsonResponse(databaseObjects);
+                            // console.log(databaseObjects)
+                        } else {
+                            sendJsonResponse(tweetObjects);
+                            console.log('---->' + tweetObjects);
+                        }
                         
-                    };
-                }); 
-                
+                    }
+
+                });
+
                 
             }
             
