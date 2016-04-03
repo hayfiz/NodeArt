@@ -229,9 +229,8 @@ var app = http.createServer(function(req, res) {
                         console.log('Results returned by the database: '+retrieved_count);
                         console.log('New tweets stored into database: '+added_count);
                         databaseObjects.push(tweetsx, {count : retrieved_count , added: added_count });
-                        tweetObjects.push(tweets);
+                        tweetObjects.push(tweets, { added: added_count });
                         if (querydb) {
-
                             sendJsonResponse(databaseObjects);
                             //sendJsonResponse(databaseObjects);
                             // console.log(databaseObjects)

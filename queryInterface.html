@@ -128,12 +128,13 @@
 //                    console.log( 'Results returned by the database: ' +  tweets[1].count+ ' ' +
 //                                 'New tweets stored into database: ' + tweets[1].added);
 
-                    if(tweets.length > 1){
-                        var counts_db = '<div>' + 'Results returned by the database: ' +  tweets[1].count+ '<br>' + ' ' +
-                                'New tweets stored into database: ' + tweets[1].added + '<br>' + 'Tweets Updated from the API: ' + tweets[1].added + '</div>';
+                    if(tweets[1].count){
+                        var counts_db = '<div>' + '<br>' + 'Results Returned by the  Twitter API: ' + tweets[1].added + '&nbsp;' +'Tweets' + '<br>' + 'New tweets stored into the database: ' + tweets[1].added + '<br>' +
+                                        'Results returned by the database: ' +  tweets[1].count+ ' ' + ' Tweets' + '<br>' +
+                                  '</div>';
                         $('#db_info').append(counts_db);
                     } else {
-                        $('#db_info').append('Tweets from the API added');
+                        $('#db_info').append(' Results Returned by the  Twitter API: ' + "  " + tweets[1].added);
                     }
 
                     _.each(tweets[0],function(tweet) {
@@ -366,6 +367,7 @@
 
         function sendData() {
             $('#most_active_users').html(''); $('#most_frequent_words').html(''); $('#count_result').html('');
+            $('#db_info').html('');
             var form = document.getElementById('myForm');
             sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
         }
