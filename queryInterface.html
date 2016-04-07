@@ -8,8 +8,6 @@
     <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/lodash/4.6.1/lodash.min.js" type="text/javascript"></script>
-    <!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXG2-B1ZOvxVuvvd-jhdi9WVPu-J2ricQ&amp;sensor=false">-->
-    <!--</script>-->
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyB0mU4ILaXvry-r7nQ3xnziVmCM_AkbCYM"></script>
 </head>
 
@@ -63,18 +61,18 @@
             <label>Enter any specific keywords:</label>
             <input type="text" name="keywords" placeholder=" ">
         </div>
-        <span><button class="ui button" id="sendButton">Query Data</button>
+        <button class="ui button" id="sendButton">Query Data</button>
+             <div class="ui error message"><ul class="list"><li></li>
+                 <li></li></ul>
+             </div>
             <br>
             <br>
-            <div class="ui-checkbox">
-                <input type="checkbox" name="dbQuery" value="YES">
-                <label> Query Database Only</label>
-            </div>
     </form>
     <br>
     <div class="ui fluid card">
         <div class="content">
             <div class="header">Tweets Timeline</div>
+            <span id="db_info"> </span>
             <div id="counts">
                 <div id="users"></div>
 
@@ -83,7 +81,6 @@
 
 
             </div>
-            <span id="db_info"> </span>
             <ul id="result">
 
             </ul>
@@ -100,12 +97,17 @@
     <script>
         function sendAjaxQuery(url, data) {
             $('#result').html('');
+            var $bodyAndHtml = $("body,html");
+            function scrollToContent () {
+                $bodyAndHtml.animate({ scrollTop: $(".content").eq(1).offset().top })
+            }
             $.ajax({
                 type: 'POST',
                 url: 'postFile.html',
                 dataType: 'json',
                 data: data,
                 success: function (tweets) {
+                    scrollToContent();
                     console.log(tweets);
                     console.log(tweets[0]);
 
@@ -114,31 +116,30 @@
                     var longCoordinates = [];
                     var tweetHTMLArray = [];
                     var tweets_A = [];
-                    var info_=[];
 
                     //words and users
                     var wordCounts = {};
                     var userCounts = {};
                     var mostUsedWords = [];
                     var mostActiveUsers= [];
+                    var finalArray = [];
 
-                    var flaggedWords = ['a', 'to', 'o', 't.co', 't', 'co', 'or','RT', 'https','so','for', 'the', 'and', 'this', 'of', 'i', 'I' ,'1','2',
-                    '3','4','5','6','7','8','9','0'];
-
-//                    console.log( 'Results returned by the database: ' +  tweets[1].count+ ' ' +
-//                                 'New tweets stored into database: ' + tweets[1].added);
+                    var flaggedWords = ['a', 'to', 'o', 't.co', 't', 'co', 'or','RT', 'https','so','for', 'the', 'and',
+                                         'this', 'of', 'i', 'I' ,'1','2', '3','4','5','6','7','8','9','0'];
 
                     if(tweets[1].count){
-                        var counts_db = '<div>' + '<br>' + 'Results Returned by the  Twitter API: ' + tweets[1].added + '&nbsp;' +'Tweets' + '<br>' + 'New tweets stored into the database: ' + tweets[1].added + '<br>' +
-                                        'Results returned by the database: ' +  tweets[1].count+ ' ' + ' Tweets' + '<br>' +
-                                  '</div>';
+                        var counts_db = '<div>' + '<br>' + 'Results Returned by the  Twitter API: ' +
+                                        tweets[1].added + '&nbsp;' +'Tweets' + '<br>' +
+                                        'New tweets stored into the database: ' + tweets[1].added + '<br>' +
+                                        'Results returned by the database: ' +  tweets[1].count+ ' ' + ' Tweets' +
+                                        '<br>' +
+                                        '</div>';
                         $('#db_info').append(counts_db);
                     } else {
                         $('#db_info').append(' Results Returned by the  Twitter API: ' + "  " + tweets[1].added);
                     }
 
                     _.each(tweets[0],function(tweet) {
-
                         //for word frequencies
                         var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
                         var words_parse = initial_words.replace(/httpstc|RT/gi, "");
@@ -159,11 +160,16 @@
                         dateReadable = new Date(Date.parse(tweet.created_at));
                         date = dateReadable.toDateString();
                         var tweetHtml = "<li>" + " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + '<br>'
-                                + "  Author: " + tweet.user.name + '&nbsp;' + "<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/"+ tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+ '&nbsp;'+ '\t\t' + '&nbsp;' + ' Date: ' + date + '<br> '
+                                + "  Author: " + tweet.user.name + '&nbsp;' + "<a title='"+ tweet.user.screen_name+
+                                "' href='http://twitter.com/"+ tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+
+                                "</a>"+ '&nbsp;'+ '\t\t' + '&nbsp;' + ' Date: ' + date + '<br> '
                                 + "  Tweet: " + tweet.htmlContent +
-                                (tweet.retweeted_status ? "<br>  Retweet: " +'@'+ tweet.retweeted_status.user.screen_name : "") + "</li>";
+                                (tweet.retweeted_status ? "<br>  Retweet: " +'@'
+                                + tweet.retweeted_status.user.screen_name : "") + "</li>";
+
                         $('#result').append(tweetHtml); // sends the tweet object to the browser
                         $('#most_frequent_words').remove();
+
                         // maps
                         tweetHTMLArray.push(tweetHtml);
                         if (tweet.geo != null ) {
@@ -174,7 +180,6 @@
                         }
 
                         _.each(words, function (word) {
-
                             if (flaggedWords.indexOf(word) === -1 && word != '') {
                                 if (typeof wordCounts[word] === 'undefined') {
                                     wordCounts[word] = 1;
@@ -200,7 +205,7 @@
                     //$('#users').append("<div id='head_users'>  " + 'Most Frequent Users: ' + " </div>");
 
                     $('#counts').html('');
-                    for(var i= 0; i< 10; i++){
+                    for(var i= 0; i < 10; i++){
                         if (mostActiveUsers[i]){
                             $('#counts').append('<div id="most_active_users">' +
                                     "<a title='" + mostActiveUsers[i].user + "' href='http://twitter.com/" +
@@ -209,14 +214,14 @@
                         }
                     }
 
-                    var finalArray = [];
 
                     mostUsedWords.sort(function(a, b){ return b.count - a.count;});
-                    // $('#counts').append("<div id='head_words'>  " + 'Most Frequent Words: ' + " </div>");
-                    for(var i= 0; i< 20; i++){
+                    for (var i = 0; i < 20; ++i){
                         if (mostUsedWords[i]) {
-                            //  console.info(mostUsedWords[i]);
-                            $('#counts').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" + mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") " + " </div>");
+                            console.info(mostUsedWords[i]);
+//                            $('#counts').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" +
+//                             mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") " +
+//                             " </div>");
                         }
                     }
 
@@ -235,77 +240,57 @@
                                     words : []
                                 }
                             };
-                            //   var tempArray = [];
+
                             _.each(tweets_A, function(tweet) {
                                 if (activeUser.test(tweet)) {
                                     tweet_counter++;
                                     temp_tweetCounter++;
-
                                     var temp_wordCount =0;
+
                                     _.each(mostUsedWords, function(word) {
                                         temp_wordCount++;
                                         if(temp_wordCount >=10)
                                             return;
                                         if (tweet.indexOf(word.word) >= 0){
                                             word_counter++;
-//                                            var info = {
-//                                                author: {
-//                                                    screen_name: user.user,
-//                                                    tweet_counts: tweet_counter,
-//                                                    words: {word : word.word, count : word.count}
-//                                                }
-//                                            };
                                             temp_info.author.words.push({word : word.word , count : word.count});
-
-//                                            info_.push(info);
-
-                                            //console.log('Author: '+ user.user + " " + 'Tweets: ' + '('+tweet_counter+')' + ' Most frequent words: '
-                                            //      + word.word + '('+ word.count+')');
                                         } else{
                                             return word.word + " is NOT in tweet.";
                                         }
                                     });
-
-
                                 } else {
                                     return user.user + " is NOT in tweet.";
                                 }
                             });
                             temp_info.author.tweet_counts = temp_tweetCounter;
-                            //  tempArray.push(temp_info);
                             finalArray.push({ user : user.user,
-                                data: temp_info});
+                                              data: temp_info}
+                                            );
                         });
                         // console.log("final Array Output: ")
                         // console.log(JSON.stringify(finalArray));
-
                     }
                     activeUserAndKeywords(tweets_A, mostActiveUsers, mostUsedWords);
 
-//                    info_.sort(function(a, b){ return b.tweets - a.tweets;});
-//                    $('#count_result').append("<div id='head_words'>  " + 'Active Users and Words: ' + " </div>");
-//                    for(var i= 0; i< 10; i++){
-//                        if (info_[i]) {
-//                            console.info(info_[i]);
-//                            $('#count_result').append('<div>' + " <img class='ui avatar image'  src='https://twitter.com/"+info_[i].author.screen_name+"/profile_image?size=original'>" + '&nbsp;' + 'Author: '+  ' ' + "<a title='"+ info_[i].author.screen_name+"' href='http://twitter.com/"+info_[i].author.screen_name+"'>"+info_[i].author.screen_name+ "</a>"+ '&nbsp;&nbsp;  '+ '  ' + '  '+
-//                                    'Tweets: ' + info_[i].author.tweet_counts + ' &nbsp;' + '&nbsp;' + 'Most Frequent Words: ' + info_[i].author.words.word + '&nbsp;' + '  ' + '('+info_[i].author.words.count+')'+" </div>");
-//                        }
-//                    }
-
                     $('#count_result').append("<div id='head_words'>  " + 'Active Users and Words: ' + " </div>");
-                    for(var i= 0; i< 10; i++){
+                    for (var i = 0; i <10; i++){
                         if (finalArray[i]) {
                           //  console.info(JSON.stringify(finalArray[i]));
-                            $('#count_result').append("<div>" + " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name + "' href='http://twitter.com/" + finalArray[i].data.author.screen_name + "'>" + finalArray[i].data.author.screen_name + "</a>" + '&nbsp;&nbsp;  ' + '  ' + '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +'&nbsp;' + 'Most Frequent Words: ' + "</div>");
-
-//                            var l=0;
-//                            for(l=0;l<finalArray[i].data.author.words.length ; l++){
+                            $('#count_result').append("<div>" +
+                                                        " <img class='ui avatar image'  src='https://twitter.com/" +
+                                                        finalArray[i].data.author.screen_name + "/profile_image?size=original'>" +
+                                                        '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name +
+                                                        "' href='http://twitter.com/" + finalArray[i].data.author.screen_name + "'>" +
+                                                        finalArray[i].data.author.screen_name + "</a>" + '&nbsp;&nbsp;  ' + '  ' + '  ' +
+                                                        'Tweets: ' + finalArray[i].data.author.tweet_counts +'&nbsp;' +
+                                                        'Most Frequent Words: ' +
+                                                        "</div>");
                            var sortedArray = _.sortBy(_.uniqBy(finalArray[i].data.author.words, 'word'), ['count', 'word']);
                             _.eachRight(_.take(sortedArray,10), function (word) {
                                // console.log(word);
-                                $('#count_result').append('<div>'+' &nbsp;' + '&nbsp;' + word.word + '&nbsp;' + '  ' + '(' + word.count + ')'+" </div>");
-                        //}
-                                });
+                                $('#count_result').append('<div>'+' &nbsp;' + '&nbsp;' + word.word + '&nbsp;' +
+                                                            '  ' + '(' + word.count + ')'+" </div>");
+                            });
                         }
 
                     }
@@ -322,12 +307,12 @@
                                 position: new google.maps.LatLng(latCoordinates[i], longCoordinates[i]),
                                 map: map,
                                 title: 'Tweet Marker'});
-                            var infowindow = new google.maps.InfoWindow({
+                            var infoWindow = new google.maps.InfoWindow({
                                 content: tweetHTMLArray[i]+latCoordinates[i]+', '+longCoordinates[i],
                                 maxWidth:200});
-                            infowindow.open(map,marker);
+                            infoWindow.open(map,marker);
                             google.maps.event.addListener(marker, 'click', function() {
-                                infowindow.open(map, marker);
+                                infoWindow.open(map, marker);
                             });
                         }
                     }
@@ -337,13 +322,17 @@
                     else {
                         $('.gm-style').remove();
                         $('#no_locations').remove();
-                        $('#map-canvas').append("<h4 id='no_locations'> <br>Your search returned no geo-located tweets :( try again next time :) <\/h4>");
+                        $('#map-canvas').append("<h4 id='no_locations'> " +
+                                "<br>Your search returned no geo-located tweets :( try again next time :) <\/h4>");
                     }
 
                 },
                 error: function(xhr, status, error) {
-                    console.log('Error: ' + error.message);
-                    $('#result').append('<li>' + 'Something went wrong sorry.' + '</li>'); // error output on webpage
+                    scrollToContent();
+                    error = xhr.responseJSON.error;
+                    console.error('Error: ' + error);
+                    $('#result').append('<li>' + 'Something went wrong sorry: ' + error + '</li>');
+                    // error output on web page
                     //alert('error connecting');
                 }
             });
@@ -373,6 +362,24 @@
         }
         var sendButton = document.getElementById('sendButton');
         sendButton.onclick = sendData;
+    </script>
+    <script>
+
+        $('.ui.form')
+                .form({
+                    fields: {
+                        teamName: {
+                            identifier: 'teamName',
+                            rules: [
+                                {
+                                    type   : 'empty',
+                                    prompt : 'Please enter a team or player name.'
+                                }
+                            ]
+                        }
+
+                    }
+                });
     </script>
 </div>
 </body>
