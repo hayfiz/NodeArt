@@ -1,27 +1,36 @@
 var http = require('http');
-var static = require('node-static');
+var NodeStatic = require('node-static');
 var util = require('util');
 var url = require('url');
 var querystring = require('querystring');
 var Twit = require('twit');
 var twitter = require('twitter-text');
-var client = new Twit({
-    consumer_key: 'o19ZQHXFRvb16vRdlhiKRR4UZ',
-    consumer_secret: 'BaZMfCaBKcSLHTC7gwupjIOHBlq587ZnpU6VnFEEnoAlWsCkKW',
-    access_token: '1519284373-PAvCS78UF0CoOcdnnz1p35OYYjIUnWQ6Tsi2iM6',
-    access_token_secret: 'o8PdyK3uXrCVW0Orh6AP8maBB0S93sbvmI4Kbs1jzmTVd'
-});
+var mongojs = require('mongojs');
+var _ = require('lodash');
+
+var credentials = require("./credentials");
+
+var client = new Twit(credentials);
 
 
-var file = new(static.Server)();
-var portNo = 3001;
-var app = http.createServer(function(req, res) {
+//db
+var dbUrl = 'localhost/nodeart';
+var collections = ['queries'];
+var db = mongojs(dbUrl, collections);
+
+var file = new(NodeStatic.Server)();
+// PORT is an environment variable used by services to specify the node.js port
+// PORT=9000 node serve1.js
+var portNo = process.env.PORT || 3001;
+
+http.createServer(function(req, res) {
     var pathname = url.parse(req.url).pathname;
 
+
     function prepareTweets(input) {
-        input.forEach(function(current) {
-            current.authorContent = twitter.autoLink(twitter.htmlEscape(current.user.screen_name));
-            current.userContent = twitter.autoLink(twitter.htmlEscape(current.user.name));
+        input[0].forEach(function(current) {
+            //current.authorContent = twitter.autoLink(twitter.htmlEscape(current.user.screen_name));
+           // current.userContent = twitter.autoLink(twitter.htmlEscape(current.user.name));
             current.htmlContent = twitter.autoLink(twitter.htmlEscape(current.text));
 
         });
@@ -55,16 +64,22 @@ var app = http.createServer(function(req, res) {
 
             var queryString = '';
             var queryStringElements = [];
+            var databaseObjects = [];
+            var tweetObjects = [];
             var queryOperator = queryContent.Or;
-            var queryTeamAuthoredTweets = queryContent.TeamAut;
-            var queryTeamMentionedTweets = queryContent.TeamMen;
-            var queryPlayerAuthoredTweets = queryContent.PlayerAut;
-            var queryPlayerMentionedTweets = queryContent.PlayerMen;
+            var qTATweets = queryContent.TeamAut;
+            var qTMTweets = queryContent.TeamMen;
+            var qPlATweets = queryContent.PlayerAut;
+            var qPlMTweets = queryContent.PlayerMen;
+            var querydb = queryContent.dbQuery;
+            var queryType = 0;
             delete queryContent.TeamAut;
             delete queryContent.TeamMen;
             delete queryContent.PlayerAut;
             delete queryContent.PlayerMen;
             delete queryContent.Or;
+            delete queryContent.dbQuery;
+
 
             //so we are now sending an answer to the ajax request with res.write,
             // we are writing a json string that represents the array of tweets.
@@ -93,10 +108,16 @@ var app = http.createServer(function(req, res) {
                 queryString = queryStringElements.join(' OR ');
             }
 
+             function checkIfYes(value) {
+                return value === 'YES';
+            }
+
+
             //checks if author and mentions checkboxes are ticked for team
-            var teamAutAndMention = (queryTeamAuthoredTweets === 'YES') && (queryTeamMentionedTweets === 'YES');
+            var teamAutAndMention = checkIfYes(qTATweets) && checkIfYes(qTMTweets);
+
             //checks if author and mentions checkboxes are ticked for player
-            var playerAutAndMention = (queryPlayerAuthoredTweets === 'YES') && (queryPlayerMentionedTweets === 'YES');
+            var playerAutAndMention = checkIfYes(qPlATweets) && checkIfYes(qPlMTweets);
             console.log(queryString);
 
             function searchTweets(queryString, cb) {
@@ -120,6 +141,8 @@ var app = http.createServer(function(req, res) {
                 var complete = 0;
                 var errors = [];
                 var finalTweets = [];
+                var queryArray = [searchQueryString, teamName+''+playerName,teamName, playerName];
+
 
                 function done(err, tweets) {
                     if (err) {
@@ -133,7 +156,8 @@ var app = http.createServer(function(req, res) {
                         } else {
                             err = null;
                         }
-                        cb(err, finalTweets);
+                        cb(err, queryArray[queryType],finalTweets);
+
                     }
                 }
 
@@ -152,36 +176,151 @@ var app = http.createServer(function(req, res) {
                 }
             }
 
-            function receivedTweets(err, tweets) {
+            function receivedTweets(err, queryString,tweets) {
                 if (err) {
-                    console.log(err);
-                    return sendJsonResponse({
-                        error: "There was an error: " + err
-                    }, false);
+                    return sendErrorResponse(err);
                 }
-                console.log(tweets);
-                sendJsonResponse(tweets);
+                // Create the object with data in it
+                // Performance: a bit faster because it's assigning the space in memory from start,
+                // without needed to assign for each dynamically added field
+
+                var db_entry = {
+                    query: queryString,
+                    queryOperator: queryOperator,
+                    queryTeamAuthoredTweets: qTATweets,
+                    queryTeamMentionedTweets: qTMTweets,
+                    queryPlayerAuthoredTweets: qPlATweets,
+                    queryPlayerMentionedTweets: qPlMTweets,
+                    tweets: tweets
+                };
+
+                // creating an exact copy of the db_entry object that contains simple data type.
+                //so it does'nt modify the original data
+                var findQuery = JSON.parse(JSON.stringify(db_entry)); /*_.cloneDeep(db_entry);*/ 
+                delete findQuery.tweets;
+
+//                                                 Check if it exists
+                // find(query) => [obj, obj1, obj2...]              if (res.length) { e } else { d }
+                // findOne(query) => obj                            if (res) { exists } else { doesn't exist }
+                db.queries.findOne(findQuery, function(err, foundQuery) {
+                    if (err) {
+                        return sendErrorResponse(err);
+                    }
+
+                    if (!foundQuery) {
+                       db.queries.save(db_entry, function(err, cachedTweets) {
+                            if (!cachedTweets) {
+                               err = "No tweets were saved."
+                            }
+                            if (err) {
+                                return sendErrorResponse(err);
+                            }
+                           var howMany = _.size(db_entry.tweets);
+                           sendJsonResponse([db_entry.tweets, {
+                               count: howMany,
+                               added: howMany
+                           }]);
+                        });
+                    } else {
+                        var sTweets = foundQuery.tweets;
+                        var retrieved_count = sTweets.length;
+                        var added_count = 0;
+                        // Iterate object fields
+                        // Object.keys(obj).forEach(...)
+
+                        // Iterate arrays
+                        // myArray.forEach(function (current) { ... });
+                        // cTweet -> currentTweet
+                        tweets.forEach(function (cTweet) {
+                            // using sre return to avoid having the code on two levels when you can have on one level
+                            // 1. Not using return
+                            // if (true) {
+                            //   do something
+                            // }
+                            // 2. Using return
+                            // if (false) { return; }
+                            // do something
+                            if (Date.parse(cTweet.created_at) <= Date.parse(sTweets[0].created_at)) {
+                                return;
+                            }
+
+                            // Update if the cTweet is AFTER the previous tweets
+                            db.queries.update({
+                                query: queryString,
+                                queryOperator: queryOperator,
+                                queryTeamAuthoredTweets: qTATweets,
+                                queryTeamMentionedTweets: qTMTweets,
+                                queryPlayerAuthoredTweets: qPlATweets,
+                                queryPlayerMentionedTweets: qPlMTweets
+                            }, {
+                                $push: {tweets: cTweet}
+                            }, function (err) {
+
+                                // Process:
+                                //  - stdout (standard out)
+                                //  - stderr (standard error)
+                                //
+                                // 1. Write in the stdout
+                                // console.log("Something");
+                                // process.stdout.write("Something\n");
+                                // 2. Write in the stderr
+                                // console.error("Something really bad happened");
+                                // process.stderr.write("Something really bad happened\n");
+
+                                if (err) {
+                                    return console.error(err);
+                                }
+
+                                console.log('added tweet');
+                            });
+
+                            sTweets.unshift(cTweet);
+                            added_count++;
+                        });
+
+                        console.log('Results returned by the database: ' + retrieved_count);
+                        console.log('New tweets stored into database: ' + added_count);
+
+                        var info = {
+                            count: retrieved_count || sTweets.length,
+                            added: added_count || sTweets.length
+                        };
+
+                        // [[tweet1, t2, t3, tN], { added: 42 }]
+                        tweetObjects.push(sTweets, info);
+
+                        // sendJsonResponse({
+                        //   tweets: sTweets,
+                        //   info: { count: ..., added: 42 }
+                        // });
+                            sendJsonResponse(tweetObjects);
+                    }
+                });
             }
 
-            /*The if statements below check for the different cases possible with the queries*/
+
+          /*The if statements below check for the different cases possible with the queries*/
             if ((teamAutAndMention && playerAutAndMention) ||
-                ((queryTeamAuthoredTweets === 'YES') && playerAutAndMention) ||
-                ((queryPlayerAuthoredTweets === 'YES') && teamAutAndMention)) {
+                (checkIfYes(qTATweets) && playerAutAndMention) ||
+                (checkIfYes(qPlATweets) && teamAutAndMention)) {
 
                 getTweets(queryString, queryContent.teamName, queryContent.playerName, receivedTweets);
             } else if (teamAutAndMention) {
                 getTweets(queryString, queryContent.teamName, null, receivedTweets);
             } else if (playerAutAndMention) {
                 getTweets(queryString, null, queryContent.playerName, receivedTweets);
-            } else if ((queryOperator === 'YES') && (queryTeamAuthoredTweets === 'YES') && (queryPlayerAuthoredTweets === 'YES')) {
+            } else if (checkIfYes(queryOperator) && (checkIfYes(qTATweets) && (checkIfYes(qPlATweet) ))) {
+                queryType = 1;
                 getTweets(null, queryContent.teamName, queryContent.playerName, receivedTweets);
-            } else if ((queryTeamAuthoredTweets === 'YES') && (queryOperator === 'YES')) {
+            } else if (checkIfYes(qTATweets)  && (checkIfYes(queryOperator))) {
                 getTweets(queryString, queryContent.teamName, null, receivedTweets);
-            } else if ((queryPlayerAuthoredTweets === 'YES') && (queryOperator === 'YES')) {
+            } else if (checkIfYes(qPlATweets) && checkIfYes(queryOperator)) {
                 getTweets(queryString, null, queryContent.playerName, receivedTweets);
-            } else if (queryTeamAuthoredTweets === 'YES') {
+            } else if (checkIfYes(qTATweets)) {
+                queryType = 2;
                 getTweets(null, queryContent.teamName, null, receivedTweets);
-            } else if (queryPlayerAuthoredTweets === 'YES') {
+            } else if (checkIfYes(qPlATweets)){
+                queryType = 3;
                 getTweets(null, null, queryContent.playerName, receivedTweets);
             } else {
                 getTweets(queryString, null, null, receivedTweets);

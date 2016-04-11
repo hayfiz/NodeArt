@@ -5,8 +5,12 @@
   "main": "server.js",
   "dependencies": {
     "favicon": "^0.0.2",
+    "gulp": "^3.9.1",
     "lodash": "^4.6.1",
+    "mongojs": "latest",
     "node-static": "^0.7.7",
+    "normalize.css": "^4.0.0",
+    "semantic-ui": "^2.1.8",
     "serve-favicon": "^2.3.0",
     "twit": "^2.2.3",
     "twitter-text": "latest"

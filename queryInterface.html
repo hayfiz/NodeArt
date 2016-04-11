@@ -1,104 +1,208 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
 <head>
-    <meta charset="utf-8">
-    <title>NodeArt</title>
+    <title>Node Tweets | Home</title>
+    <!-- Custom Theme files -->
     <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
-    <script src="/semantic/bower_components/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="node_modules/normalize.css/normalize.css">
+    <link  rel="stylesheet" type="text/css" href="/css/main.css" media="all"/>
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
     <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
+    <!-- Custom Theme files -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content=" Twitter API web Scrapper, Search form, Tweeter Tweets,  Google Maps API " />
+    <!-- Lodash and Google Maps Packages -->
     <script src="https://cdn.jsdelivr.net/lodash/4.6.1/lodash.min.js" type="text/javascript"></script>
-    <!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXG2-B1ZOvxVuvvd-jhdi9WVPu-J2ricQ&amp;sensor=false">-->
-    <!--</script>-->
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyB0mU4ILaXvry-r7nQ3xnziVmCM_AkbCYM"></script>
+
 </head>
 
 <body>
+<!--search start here-->
+
 <div class="ui container">
-    <h1 class="ui header">
-        <span class="ui image"><i class="feed icon"></i></span>
-        <div class="content">
-            Twitter Scrapper
+    <div class="ui blue message">
+   <h4 class="cen">Querying the social Web!</h4>
+    </div>
+    <div class="ui info message">
+        <i class="close icon"></i>
+        <div class="header">
+            <h4 class="ui">Team <b>NodeArtizts</b> welcomes you!.</h4>
         </div>
-    </h1>
-    <h2 class="ui dividing header">Query some Twitter data</h2>
-    <form class="ui form" id="myForm" onsubmit="return false;">
-        <input type="radio" name="Or" value="No"> AND
-        <br>
-        <input type="radio" name="Or" value="YES"> OR
-        <br>
-        <div class="field">
-            <label> Enter the @ of a team you would like to search for:</label>
-            <input type="text" name="teamName" placeholder="@ManUtd">
+        <p>Track discussions concerning a football team and it's players!</p>
+    </div>
+
+
+<!--<div class="search">-->
+    <form class="ui form" id="myForm" onsubmit="return false;" name="myForm">
+        <div class="ui segment">
+        <!-- /."" -->
+        <div class="fields">
+            <div class=" centered fourteen wide field">
+                <label>SEARCH TYPE</label>
+                <select class="ui dropdown" name="Or">
+                    <option value="">ALL</option>
+                    <option value="No"> AND</option>
+                    <option value="YES">OR</option>
+                </select>
+            </div>
+        </div>
+        <div class="fields">
+            <div class=" twelve wide field">
+                <label>Team Name:</label>
+                    <input type="text" name="teamName" name="tm_name" placeholder="What @Team would you like to search for?">
+            </div>
+        </div>
+
+        <div class="ui horizontal segments">
+            <div class="ui segment">
+                <div class="two wide field">
+                    <div class="inline field">
+                        <div class="ui slider checkbox">
+                            <input type="checkbox" tabindex="0" class="hidden" name="TeamAut" value="YES">
+                            <label>Author</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui segment">
+                <div class="two wide field">
+                    <div class="inline field">
+                        <div class="ui slider checkbox">
+                            <input type="checkbox" tabindex="0" class="hidden" name="TeamMen" value="YES">
+                            <label>Mentions</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="fields">
+            <div class=" twelve wide field">
+                <label>Player Name:</label>
+                <input type="text" name="playerName" placeholder="What @player name would you like to search for?">
+            </div>
+        </div>
+
+        <div class="ui horizontal segments">
+            <div class="ui segment">
+                <div class="two wide field">
+                    <div class="inline field">
+                        <div class="ui slider checkbox">
+                            <input type="checkbox" tabindex="0" class="hidden" name="PlayerAut" value="YES">
+                            <label>Author</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui segment">
+                <div class="two wide field">
+                     <div class="inline field">
+                            <div class="ui slider checkbox">
+                                <input type="checkbox" tabindex="0" class="hidden" name="PlayerMen" value="YES">
+                                <label>Mentions</label>
+                            </div>
+                     </div>
+                 </div>
+            </div>
+        </div>
+        <div class="ui equal width form">
+            <div class="fields">
+                <div class="field">
+                    <label>Hashtags:</label>
+                    <input type="text" name="hashtag" placeholder="Enter any related hashtags..">
+                </div>
+                <div class="field">
+                    <label>Keywords:</label>
+                    <input type="text" name="keywords" placeholder="" >
+                </div>
+            </div>
+        <button class="ui primary large button" id="sendButton" tabindex="0">Search Twitter</button>
             <br>
             <br>
             <div class="ui-checkbox">
-                <input type="checkbox" name="TeamAut" value="YES">
-                <label> Author</label>
+                <input type="checkbox" name="dbQuery" value="YES">
+                <label> Query Database Only</label>
             </div>
-            <div class="ui-checkbox">
-                <input type="checkbox" name="TeamMen" value="YES">
-                <label> Mentions</label>
-            </div>
+
+        <div class="ui error message">
+            <ul class="list"></ul>
         </div>
-        <div class="field">
-            <label>Enter the @ of a player you'd like to find:</label>
-            <input type="text" name="playerName" placeholder="@WayneRooney">
-            <br>
-            <br>
-            <div class="ui-checkbox">
-                <input type="checkbox" name="PlayerAut" value="YES">
-                <label> Author</label>
-            </div>
-            <div class="ui-checkbox">
-                <input type="checkbox" name="PlayerMen" value="YES">
-                <label> Mentions</label>
-            </div>
         </div>
-        <div class="field">
-            <label>Enter any related hashtags:</label>
-            <input type="text" name="hashtag" placeholder="#Research">
         </div>
-        <div class="field">
-            <label>Enter any specific keywords:</label>
-            <input type="text" name="keywords" placeholder=" ">
-        </div>
-        <button class="ui button" id="sendButton">Query Data</button>
     </form>
-    <br>
-    <div class="ui fluid card">
-        <div class="content">
-            <div class="header">Tweets Timeline</div>
+    <!--search end here-->
+
+     <div class="ui message">
+        <div class="header">
+            Query Information
+        </div>
+        <ul class="list">
+            <li>You can now see the most active users</li>
+            <li>You can now see the tweets </li>
+        </ul>
+        <div class="ui info message" id="db_info">
+            <i class="small close icon"></i>
+        </div>
+    </div>
+
+<div class="ui three column divided grid" id="content">
+  <div class="row">
+    <div class=" five wide column">
+      <div class="ui  stacked segment">
+       <div id="count_result"></div>
+      </div>
+    </div>
+    <div class="eight wide column">
+      <div class="ui stackeds segment">
+        <div class="ui blue cen header"><h4>Tweets Timeline</h4></div>
+         <div id="result"></div>
+      </div>
+    </div>
+    <div class=" three wide column">
+      <div class="ui stacked segment">
+        <div class="ui blue cen header"><h4>Most Active Users</h4></div>
+         <div class="ui horizontal divider"> - </div>
             <div id="counts">
-                <div id="users"></div>
-
+                <!-- <div id="users"></div> -->
             </div>
-            <div id="count_result">
+      </div>
+     </div>
+  </div>
+</div>
 
-
-            </div>
-            <ul id="result">
-
-            </ul>
-        </div>
-        <!-- for now lets make it simple -->
-    </div>
     <div class="ui fluid card">
         <div class="content">
-            <div class="header">Tweet locations</div>
-            <div id="map-canvas" style="width:100%;height:300pt;align:center;"></div>
+            <div class="ui blue cen header"><h4>Tweet Locations</h4></div>
+            <div id="map-canvas">
+            </div>
         </div>
     </div>
+
+</div>
 
     <script>
         function sendAjaxQuery(url, data) {
             $('#result').html('');
+            var $bodyAndHtml = $("body,html");
+            // function scrollToContent () {
+            //     $bodyAndHtml.animate({ scrollTop: $("#content").eq(1).offset().top })
+            // }
             $.ajax({
                 type: 'POST',
                 url: 'postFile.html',
                 dataType: 'json',
                 data: data,
                 success: function (tweets) {
+                // scrollToContent();
+                    console.log(tweets);
+                    console.log(tweets[0]);
+
 
                     // maps
                     var latCoordinates = [];
@@ -113,11 +217,23 @@
                     var mostUsedWords = [];
                     var mostActiveUsers= [];
 
-                    var flaggedWords = ['a', 'to', 'o', 't.co', 't', 'co', 'or','RT', 'https','so','for', 'the', 'and', 'this', 'of', 'i', 'I' ,'1','2',
+                    var flaggedWords = ['a', 'A', 'as','it','on','in', 'to', 'o', 't.co', 't', 'co', 'or','RT', 'https','so','for', 'the', 'and', 'this', 'of', 'i', 'I' ,'1','2',
                     '3','4','5','6','7','8','9','0'];
 
+                    if(tweets[1].count){
+                        var counts_db = '<div>' + '<br>' + 'Results Returned by the  Twitter API: ' +
+                                        tweets[1].added + '&nbsp;' +'Tweets' + '<br>' +
+                                        'New tweets stored into the database: ' + tweets[1].added + '<br>' +
+                                        'Results returned by the database: ' +  tweets[1].count+ ' ' + ' Tweets' +
+                                        '<br>' +
+                                        '</div>';
+                        $('#db_info').append(counts_db);
+                    } else {
+                        $('#db_info').append(' Results Returned by the  Twitter API: ' + "  " + tweets[1].added);
+                    }
 
-                    _.each(tweets,function(tweet) {
+
+                    _.each(tweets[0],function(tweet) {
 
                         //for word frequencies
                         var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
@@ -139,10 +255,17 @@
                         var dateReadable, date;
                         dateReadable = new Date(Date.parse(tweet.created_at));
                         date = dateReadable.toDateString();
-                        var tweetHtml = "<li>" + " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + '<br>'
-                                + "  Author: " + tweet.user.name + '&nbsp;' + "<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/"+ tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+ '&nbsp;'+ '\t\t' + '&nbsp;' + ' Date: ' + date + '<br> '
-                                + "  Tweet: " + tweet.htmlContent +
-                                (tweet.retweeted_status ? "<br>  Retweet: " +'@'+ tweet.retweeted_status.user.screen_name : "") + "</li>";
+                        // var tweetHtml = "<li>" + " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + '<br>'
+                        //         + "  Author: " + tweet.user.name + '&nbsp;' + "<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/"+ tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+ '&nbsp;'+ '\t\t' + '&nbsp;' + ' Date: ' + date + '<br> '
+                        //         + "  Tweet: " + tweet.htmlContent +
+                        //         (tweet.retweeted_status ? "<br>  Retweet: " +'@'+ tweet.retweeted_status.user.screen_name : "") + '<div class="ui divider">'+ "</li>";
+                        var tweetHtml = '<div class="ui list">' + '<div class="item">' +
+                                        " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" +
+                                        '<div class="content">' + '<div class="header">' + "Author: " + tweet.user.name + '&nbsp;' +"<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/" + tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+
+                                            '&nbsp;'+ '\t\t' + '&nbsp;' + '</div>' + '<span class="date cen">' + ' Date: ' + date +  '</span>' + '<br>'+ '<br>'  + '<div class="description">' + "  Tweet: " + tweet.htmlContent +
+                                (tweet.retweeted_status ? "<br>  Retweet: " +'@'+
+                                tweet.retweeted_status.user.screen_name : "") +
+                                '<div class="ui divider">'+ '</div>' + '</div>' + '</div>';
                         $('#result').append(tweetHtml); // sends the tweet object to the browser
                         $('#most_frequent_words').remove();
                         // maps
@@ -170,7 +293,6 @@
 
                     for( var word in wordCounts){
                         mostUsedWords.push({word: word, count: wordCounts[word]});
-                        // quantity: wordCounts2[word]
                     }
 
                     for (var user in userCounts){
@@ -178,15 +300,14 @@
                     }
 
                     mostActiveUsers.sort(function(a, b) { return b.seen - a.seen;});
-                    //$('#users').append("<div id='head_users'>  " + 'Most Frequent Users: ' + " </div>");
 
                     $('#counts').html('');
                     for(var i= 0; i< 10; i++){
                         if (mostActiveUsers[i]){
-                            $('#counts').append('<div id="most_active_users">' +
+                            $('#counts').append('<div id="most_active_users" class="">' +
                                     "<a title='" + mostActiveUsers[i].user + "' href='http://twitter.com/" +
                                     mostActiveUsers[i].user + "'>" + mostActiveUsers[i].user + '&nbsp;' +
-                                    "</a>" + 'count =  (' + mostActiveUsers[i].seen + ')');
+                                    "</a>" +' (' + mostActiveUsers[i].seen + ')');
                         }
                     }
 
@@ -194,12 +315,12 @@
 
                     mostUsedWords.sort(function(a, b){ return b.count - a.count;});
                     // $('#counts').append("<div id='head_words'>  " + 'Most Frequent Words: ' + " </div>");
-                    for(var i= 0; i< 20; i++){
-                        if (mostUsedWords[i]) {
-                            //  console.info(mostUsedWords[i]);
-                            $('#counts').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" + mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") " + " </div>");
-                        }
-                    }
+                    // for(var i= 0; i< 20; i++){
+                    //     if (mostUsedWords[i]) {
+                    //           console.info(mostUsedWords[i]);
+                    //          $('#counts').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" + mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") " + " </div>");
+                    //     }
+                    // }
 
 
                     function activeUserAndKeywords(tweets_A, mostActiveUsers, mostUsedWords){
@@ -208,7 +329,6 @@
 
                         _.each(mostActiveUsers, function (user) {
                         var temp_tweetCounter =0;
-                        console.log("--> MostActiveUser = "+ user.user);
                         var activeUser = new RegExp(user.user);
                             var temp_info = {
                                 author: {
@@ -217,7 +337,7 @@
                                     words : []
                                 }
                             };
-                            //   var tempArray = [];
+
                             _.each(tweets_A, function(tweet) {
                                 if (activeUser.test(tweet)) {
                                     tweet_counter++;
@@ -230,64 +350,33 @@
                                             return;
                                         if (tweet.indexOf(word.word) >= 0){
                                             word_counter++;
-//                                            var info = {
-//                                                author: {
-//                                                    screen_name: user.user,
-//                                                    tweet_counts: tweet_counter,
-//                                                    words: {word : word.word, count : word.count}
-//                                                }
-//                                            };
                                             temp_info.author.words.push({word : word.word , count : word.count});
-
-//                                            info_.push(info);
-
-                                            //console.log('Author: '+ user.user + " " + 'Tweets: ' + '('+tweet_counter+')' + ' Most frequent words: '
-                                            //      + word.word + '('+ word.count+')');
                                         } else{
                                             return word.word + " is NOT in tweet.";
                                         }
                                     });
-
-
                                 } else {
                                     return user.user + " is NOT in tweet.";
                                 }
                             });
                             temp_info.author.tweet_counts = temp_tweetCounter;
-                            //  tempArray.push(temp_info);
                             finalArray.push({ user : user.user,
                                 data: temp_info});
                         });
-                        // console.log("final Array Output: ")
-                        // console.log(JSON.stringify(finalArray));
 
                     }
                     activeUserAndKeywords(tweets_A, mostActiveUsers, mostUsedWords);
 
-//                    info_.sort(function(a, b){ return b.tweets - a.tweets;});
-//                    $('#count_result').append("<div id='head_words'>  " + 'Active Users and Words: ' + " </div>");
-//                    for(var i= 0; i< 10; i++){
-//                        if (info_[i]) {
-//                            console.info(info_[i]);
-//                            $('#count_result').append('<div>' + " <img class='ui avatar image'  src='https://twitter.com/"+info_[i].author.screen_name+"/profile_image?size=original'>" + '&nbsp;' + 'Author: '+  ' ' + "<a title='"+ info_[i].author.screen_name+"' href='http://twitter.com/"+info_[i].author.screen_name+"'>"+info_[i].author.screen_name+ "</a>"+ '&nbsp;&nbsp;  '+ '  ' + '  '+
-//                                    'Tweets: ' + info_[i].author.tweet_counts + ' &nbsp;' + '&nbsp;' + 'Most Frequent Words: ' + info_[i].author.words.word + '&nbsp;' + '  ' + '('+info_[i].author.words.count+')'+" </div>");
-//                        }
-//                    }
-
-                    $('#count_result').append("<div id='head_words'>  " + 'Active Users and Words: ' + " </div>");
+                    $('#count_result').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Active Users and Words: ' + '</h4>' + "</div>");
                     for(var i= 0; i< 10; i++){
                         if (finalArray[i]) {
-                            console.info(JSON.stringify(finalArray[i]));
-                            $('#count_result').append("<div>" + " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name + "' href='http://twitter.com/" + finalArray[i].data.author.screen_name + "'>" + finalArray[i].data.author.screen_name + "</a>" + '&nbsp;&nbsp;  ' + '  ' + '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +'&nbsp;' + 'Most Frequent Words: ' + "</div>");
+                            $('#count_result').append("<div>" + " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name + "' href='http://twitter.com/" + finalArray[i].data.author.screen_name + "'>" + finalArray[i].data.author.screen_name + "</a>" + '&nbsp;&nbsp;  ' + '  ' + '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +'&nbsp;' + "<div class='ui blue cen'>" + "<h5>" + 'Most Frequent Words:' + '</h5>' + '<div class="ui fitted divider">'+ '</div>' + "</div>");
 
-//                            var l=0;
-//                            for(l=0;l<finalArray[i].data.author.words.length ; l++){
-                           var sortedArray =  _.sortBy(_.uniqBy(finalArray[i].data.author.words, 'word'), ['word', 'count']);
-                            _.each(_.take(sortedArray,10), function (word) {
-                                console.log(word);
-                                $('#count_result').append('<div>'+' &nbsp;' + '&nbsp;' + word.word + '&nbsp;' + '  ' + '(' + word.count + ')'+" </div>");
-                        //}
-                                });
+                           var sortedArray =  _.sortBy(_.uniqBy(finalArray[i].data.author.words, 'word'), ['count', 'word']);
+                            _.eachRight(_.take(sortedArray,10), function (word) {
+                                $('#count_result').append('<div>' + word.word + '&nbsp;' + '  ' + '(' + word.count + ')'+" </div>");
+                                 });
+                            $('#count_result').append('<div class="ui divider"></div>');
                         }
 
                     }
@@ -324,6 +413,7 @@
 
                 },
                 error: function(xhr, status, error) {
+                    //scrollToContent();
                     console.log('Error: ' + error.message);
                     $('#result').append('<li>' + 'Something went wrong sorry.' + '</li>'); // error output on webpage
                     //alert('error connecting');
@@ -351,12 +441,68 @@
             $('#most_active_users').html('');
             $('#most_frequent_words').html('');
             $('#count_result').html('');
+            $('#db_info').html('');
             var form = document.getElementById('myForm');
             sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
         }
         var sendButton = document.getElementById('sendButton');
         sendButton.onclick = sendData;
     </script>
+<footer>
+    <div class="copyright">
+            <p>2015 Leonrd & Hayford All rights reserved </p>
+    </div>
+</footer>
+<script>
+    $('select.dropdown').dropdown();
+    $('.ui.checkbox').checkbox();
+    $('.ui.form').form({fields:
+                        {
+                        playerName: {
+                        identifier : 'playerName',
+                        optional   : true,
+                        rules: [
+                            {
+                                type   : 'regExp[/@[a-z0-9_-]+/gi]',
+                                prompt : 'Please enter a valid player  screen name.'
+                            },
+                            {
+                                type   : 'empty',
+                                prompt : 'Please enter a Player name.'
+                            },
+                            ]
+                        },
+                            teamName: {
+                                identifier : 'teamName',
+                                rules: [
+                                    {
+                                        type   : 'empty',
+                                        prompt : 'Please enter a Team or Player name.'
+                                    },
+                                    {
+                                        type   : 'regExp[/@[a-z0-9_-]+/gi]',
+                                        prompt : 'Please enter a valid team screen name. - [@name]'
+                                    }
+                                ]
+                            },
+                            Hashtags: {
+                                identifier : 'hashtag',
+                                optional : true,
+                                rules: [
+                                    {
+                                        type   : 'regExp[/#[a-z0-9_-]+/gi]',
+                                        prompt : 'Please enter a valid Hashtag. - [#name]'
+                                    }
+                                ]
+                            }
+
+                }
+    });
+    $('.message .close')
+            .on('click', function() {
+                $(this).closest('.message').transition('fade');
+            });
+</script>
 </div>
 </body>
 </html>

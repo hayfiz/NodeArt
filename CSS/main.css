@@ -1,0 +1,101 @@
+/*--
+Author: Enoch Leonard
+Author URL: Leonrdenoc.me
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+--*/
+
+
+a{text-decoration:none;}
+.txt-rt{text-align:right;}/* text align right */
+.txt-lt{text-align:left;}/* text align left */
+.txt-center{text-align:center;}/* text align center */
+.float-rt{float:right;}/* float right */
+.float-lt{float:left;}/* float left */
+.clear{clear:both;}/* clear float */
+.pos-relative{position:relative;}/* Position Relative */
+.pos-absolute{position:absolute;}/* Position Absolute */
+.vertical-base{ vertical-align:baseline;}/* vertical align baseline */
+.vertical-top{  vertical-align:top;}/* vertical align top */
+.underline{ padding-bottom:5px; border-bottom: 1px solid #eee; margin:0 0 20px 0;}/* Add 5px bottom padding and a underline */
+nav.vertical ul li{ display:block;}/* vertical menu */
+nav.horizontal ul li{   display: inline-block;}/* horizontal menu */
+img{max-width:100%;}
+/*end reset*/
+/*--login form start here--*/
+body {
+  background: #FFFFFF;
+  background-size: cover;
+  margin: 0 auto;
+  padding: 40px;
+  /*font-family: 'Open Sans', sans-serif;*/
+  /*font-size: 100%;*/
+}
+.ui.form .fourteen.wide.field{
+    text-align: center;
+}
+.ui.form .field>.selection.dropdown{
+    margin: 3%;
+}
+
+.ui.form .field>label{
+    font-size: 1rem;
+    color: #939393;
+}
+label{
+    vertical-align: top;
+    font-family: Source Sans Pro, Arial, sans-serif;
+    cursor: pointer;
+}
+
+button#sendButton.ui.primary.large.button{
+    margin-left: 44%;
+}
+
+.cen{
+    text-align: center;
+    color: #939394;
+}
+
+.map_canvas{
+    width:100%;
+    height:350pt;
+    align:center;
+}
+
+.copyright {
+  margin: 15em 0 0 0;
+  text-align: center;
+}
+
+.copyright p {
+  font-size: 0.875em;
+  font-weight: 400;
+  color: seagreen;
+}
+
+.copyright p a{
+  font-size: 1em;
+  font-weight: 400;
+  color:#8EDB15;
+}
+
+.copyright p a:hover{
+  color: #fff;
+  transition: 0.5s all;
+  -webkit-transition: 0.5s all;
+  -moz-transition: 0.5s all;
+  -o-transition: 0.5s all;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 70px;
+    background-color:#2B303B;
+}
+hr{
+  color: #eee;
+}
