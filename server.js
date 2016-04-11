@@ -18,7 +18,6 @@ var credentials = require("./credentials");
 
 var client = new Twit(credentials);
 
-
 // mongoDB setup
 var dbUrl = 'localhost/nodeart';
 var collections = ['queries'];
@@ -45,7 +44,9 @@ http.createServer(function(req, res) {
      */
     function prepareTweets(input) {
         input[0].forEach(function(current) {
-            current.htmlContent = twitter.autoLink(twitter.htmlEscape(current.text));
+            if(current.text) {
+                current.htmlContent = twitter.autoLink(twitter.htmlEscape(current.text));
+            }
         });
     }
 
@@ -179,7 +180,7 @@ http.createServer(function(req, res) {
                     q: queryString,
                     count: 300 //, geocode: "53.383055,-1.464795,200km"
                 }, function(err, res) {
-                    cb(err, res /*&& res.statuses*/);
+                    cb(err, res && res.statuses);
                 });
             }
 

@@ -276,10 +276,11 @@
                         //for word frequencies -
                         // clearing out twitter handles, links and hashtags
                         // pushing the cleared result to an array tweets_A.
-                        var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
-                        var words_parse = initial_words.replace(/httpstc|RT/gi, "");
-                        var words = words_parse.split(' ');
-                        tweets_A.push(tweet.text);
+                        if(tweet.text)  {
+                            var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
+                            var words_parse = initial_words.replace(/httpstc|RT/gi, "");
+                            var words = words_parse.split(' ');
+                            tweets_A.push(tweet.text);
 
                         // for most active users -
                         // getting twitter handles and frequencies.
@@ -327,6 +328,7 @@
                             }
 
                         }); // words each
+                    }
 
                     }); //Tweet Each
 
@@ -359,7 +361,7 @@
                      $('#words').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Most Frequent Words: ' + '</h4>' +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
                      for(var i= 0; i< 20; i++){
                          if (mostUsedWords[i]) {
-                               console.info(mostUsedWords[i]);
+                              // console.info(mostUsedWords[i]);
                               $('#words').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" +
                                       mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") "
                                       + " </div>");
