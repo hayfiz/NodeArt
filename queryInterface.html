@@ -179,23 +179,23 @@
             </div>
         </div>
     </div>
-
+<a href="#0" class="cd-top">Top</a>
 </div>
 
     <script>
         function sendAjaxQuery(url, data) {
             $('#result').html('');
             var $bodyAndHtml = $("body,html");
-            // function scrollToContent () {
-            //     $bodyAndHtml.animate({ scrollTop: $("#content").eq(1).offset().top })
-            // }
+            function scrollToContent () {
+                $bodyAndHtml.animate({scrollTop: $(window).scrollTop() + 1000 });
+            }
             $.ajax({
                 type: 'POST',
                 url: 'postFile.html',
                 dataType: 'json',
                 data: data,
                 success: function (tweets) {
-                // scrollToContent();
+                scrollToContent();
                     console.log(tweets);
                     console.log(tweets[0]);
 
@@ -409,7 +409,7 @@
 
                 },
                 error: function(xhr, status, error) {
-                    //scrollToContent();
+                    scrollToContent();
                     console.log('Error: ' + error.message);
                     $('#result').append('<li>' + 'Something went wrong sorry.' + '</li>'); // error output on webpage
                     //alert('error connecting');
@@ -499,6 +499,7 @@
                 $(this).closest('.message').transition('fade');
             });
 </script>
+<script src="main.js"></script>
 </div>
 </body>
 </html>
