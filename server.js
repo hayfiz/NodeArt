@@ -89,17 +89,28 @@ http.createServer(function(req, res) {
 
 
 
-            // check Lodash, _.pick[queryContent[queryContent,'playerName','teamName'];
+          // check Lodash, _.pick[queryContent[queryContent,'playerName','teamName'];
             //filtering out all the key value pairs which are empty
+            Object.keys(queryContent).forEach(function (key) {
+                var value = queryContent[key];
+                if (value !== '') {
+                    queryStringElements.push(value);
+                }
+            });
+            /*
+            1. One way is using for (key in obj) {...}
             for (var key in queryContent) {
                 //making sure we iterate only on real keys and not prototype keys.
                 if (!queryContent.hasOwnProperty(key)) {
                     continue;
                 }
-                if (queryContent[key] !== '') {
-                    queryStringElements.push(queryContent[key]);
-                }
+                // Do stuff
             }
+            2. The shorter way is to use:
+            Object.keys(obj).forEach(function (key) {
+                var value = obj[key];
+            });
+            */
 
             //building the query string from the filtered non-empty strings.
             if (queryOperator === 'No') {
