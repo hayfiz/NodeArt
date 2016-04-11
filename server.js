@@ -261,12 +261,9 @@ http.createServer(function(req, res) {
              * Updates current tweets and send tweet object as a Json response to the browser.
              *
              * @method receivedTweets
-             * @param {String} foo Argument 1
-             * @param {Object} config A config object
-             * @param {String} config.name The name on the config object
-             * @param {Function} config.callback A callback function on the config object
-             * @param {Boolean} [extra=false] Do extra, optional work
-             * @return {Object} Returns true on success
+             * @param {String} err  an error
+             * @param {Object} tweets the tweets objects to be added to the database and processed.
+             * @param {String} queryString of which tweet objects were searched for.
              */
             function receivedTweets(err, queryString,tweets) {
                 if (err) {
