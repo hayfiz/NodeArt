@@ -4,9 +4,7 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="moment" level="application" />
-    <orderEntry type="library" name="lodash" level="application" />
-    <orderEntry type="library" name="moment" level="application" />
+    <orderEntry type="library" name="NodeArt node_modules" level="project" />
     <orderEntry type="library" name="NodeArt node_modules" level="project" />
   </component>
   <component name="TemplatesService">

@@ -5,7 +5,7 @@
     <!-- Custom Theme files -->
     <link rel="stylesheet" type="text/css" href="/semantic/dist/semantic.min.css">
     <link rel="stylesheet" href="node_modules/normalize.css/normalize.css">
-    <link  rel="stylesheet" type="text/css" href="/css/main.css" media="all"/>
+    <link  rel="stylesheet" type="text/css" href="/CSS/main.css" media="all"/>
     <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
     <script src="/semantic/dist/semantic.min.js" type="text/javascript"></script>
     <!-- Custom Theme files -->
@@ -22,6 +22,7 @@
 <body>
 <!--search start here-->
 
+<!-- Header -->
 <div class="ui container">
     <div class="ui blue message">
    <h4 class="cen">Querying the social Web!</h4>
@@ -33,12 +34,13 @@
         </div>
         <p>Track discussions concerning a football team and it's players!</p>
     </div>
+<!-- Header End -->
 
 
-<!--<div class="search">-->
+<!-- Search Form -->
     <form class="ui form" id="myForm" onsubmit="return false;" name="myForm">
         <div class="ui segment">
-        <!-- /."" -->
+        <!-- Search type selection -->
         <div class="fields">
             <div class=" centered fourteen wide field">
                 <label>SEARCH TYPE</label>
@@ -49,6 +51,8 @@
                 </select>
             </div>
         </div>
+        <!-- Search Type Selection End  -->
+        <!-- Form Fields -->
         <div class="fields">
             <div class=" twelve wide field">
                 <label>Team Name:</label>
@@ -122,15 +126,20 @@
                     <input type="text" name="keywords" placeholder="" >
                 </div>
             </div>
+            <!-- Form Fields End -->
+            <!-- Submit Button -->
         <button class="ui primary large button" id="sendButton" tabindex="0">Search Twitter</button>
+        <!-- Error/ Validation Massages -->
         <div class="ui error message">
             <ul class="list"></ul>
         </div>
+        <!--  Error/ Validation Messages -->
         </div>
         </div>
     </form>
     <!--search end here-->
 
+<!-- UI Messages -->
      <div class="ui message">
         <div class="header">
             Change Log - Query Infomation
@@ -141,106 +150,143 @@
             <li>You can now see the tweets. </li>
             <li>Profile images have also been added. </li>
             <li>Cache has been implemented with MongoDB.</li>
+            <li>Geo-location tweets are available</li>
         </ul>
         <div class="ui info message" id="db_info">
             <i class="small close icon"></i>
         </div>
     </div>
 
-<div class="ui three column divided grid" id="content">
-  <div class="row">
-    <div class=" five wide column">
-      <div class="ui  stacked segment">
-       <div id="count_result"></div>
-      </div>
-    </div>
-    <div class="eight wide column">
-      <div class="ui stackeds segment">
-        <div class="ui blue cen header"><h4>Tweets Timeline</h4></div>
-         <div id="result"></div>
-      </div>
-    </div>
-    <div class=" three wide column">
-      <div class="ui stacked segment">
-        <div class="ui blue cen header"><h4>Most Active Users</h4></div>
-         <div class="ui horizontal divider"> - </div>
-            <div id="counts">
-                <!-- <div id="users"></div> -->
-            </div>
-      </div>
-     </div>
-  </div>
-</div>
-
-    <div class="ui fluid card">
+<div class="ui segment">
         <div class="content">
-            <div class="ui blue cen header"><h4>Tweet Locations</h4></div>
-            <div id="map-canvas">
+          <div id="map-canvas" style="width:auto;%;height:300pt;align:center;"/>
+        </div>
+</div>
+<div class="ui horizontal divider"> <i class="huge loading map icon"></i></div>
+<div class="ui three column divided grid" id="content">
+    <div class="row">
+        <div class=" five wide column">
+            <div class="ui segment">
+                <div id="count_result"></div>
+            </div>
+        </div>
+        <div class="eight wide column">
+            <div class="ui segment">
+                <div id="result" class="ui relaxed  devided list"></div>
+            </div>
+        </div>
+        <div class=" three wide column">
+            <div class="ui stacked segment">
+                <div id="counts"></div>
+            </div>
+            <div class="ui stacked segment">
+                <div id="words"></div>
             </div>
         </div>
     </div>
+</div>
 
+    <a href="#0" class="cd-top">Top</a>
 </div>
 
     <script>
         function sendAjaxQuery(url, data) {
             $('#result').html('');
             var $bodyAndHtml = $("body,html");
-            // function scrollToContent () {
-            //     $bodyAndHtml.animate({ scrollTop: $("#content").eq(1).offset().top })
-            // }
+            /**
+            * Method to scroll to content when query is made.
+            * browser scrolls down to content section
+            *
+            * @method scrollToContent
+            * @param {object} $bodyAndHtml
+            */
+            function scrollToContent () {
+                $bodyAndHtml.animate({scrollTop: $(window).scrollTop() + 1000 });
+            }
+
             $.ajax({
                 type: 'POST',
                 url: 'postFile.html',
                 dataType: 'json',
                 data: data,
                 success: function (tweets) {
-                // scrollToContent();
-                    console.log(tweets);
-                    console.log(tweets[0]);
+                scrollToContent();
 
-
-                    // maps
+                    // Map Variables.
                     var latCoordinates = [];
                     var longCoordinates = [];
                     var tweetHTMLArray = [];
                     var tweets_A = [];
-                    var info_=[];
 
-                    //words and users
+                    // Word Counts and User Frequency Variables
                     var wordCounts = {};
                     var userCounts = {};
                     var mostUsedWords = [];
                     var mostActiveUsers= [];
 
-                    var flaggedWords = ['a', 'A', 'as','it','on','in', 'to', 'o', 't.co', 't', 'co', 'or','RT', 'https','so','for', 'the', 'and', 'this', 'of', 'i', 'I' ,'1','2',
-                    '3','4','5','6','7','8','9','0'];
-
+                    // Words that are not counted as words. should therefore be ignored.
+                    var flaggedWords =
+                    [
+                    'a', 'A', 'as','it','on','in', 'to', 'o', 't.co', 't', 'co','or','RT',
+                    'https','so','for', 'the', 'and', 'this', 'of', 'i', 'I' ,'1','2','3','4',
+                    '5','6','7','8','9','0'
+                    ];
+                    /**
+                    * Gives information on the frequency of tweets returned from the database
+                    *
+                    * @param tweets[1].added - tweets added to the database from the API
+                    * @param tweets[1].count -  strength of tweets returned
+                    *
+                    */
                     if(tweets[1].count){
-                        var counts_db = '<div>' + '<br>' + 'Results Returned by the  Twitter API: ' +
+                        var counts_db = '<div>' +
+                                        '<br>' + 'Results Returned by the  Twitter API: ' +
                                         tweets[1].added + '&nbsp;' +'Tweets' + '<br>' +
-                                        'New tweets stored into the database: ' + tweets[1].added + '<br>' +
-                                        'Results returned by the database: ' +  tweets[1].count+ ' ' + ' Tweets' +
-                                        '<br>' +
+                                        'New tweets stored into the database: ' + tweets[1].added +
+                                        '<br>'+'Results returned by the database: ' +
+                                         tweets[1].count+ ' ' + ' Tweets' +'<br>' +
                                         '</div>';
+                        // tweets information sent to the web page
                         $('#db_info').append(counts_db);
                     } else {
-                        $('#db_info').append(' Results Returned by the  Twitter API: ' + "  " + tweets[1].added);
+                        $('#db_info').append(' Results Returned by the  Twitter API: ' +
+                            "  " + tweets[1].added);
                     }
+                    /**
+                        * ForEach Loop - Loops through the tweet object to get the tweets and authors,
+                        * Base loop where word and user frequency computation is done.
+                        *
+                        * @method methodName
+                        * @param {date} date = dateReadable.toDateString();
+                        * @param {tweetHtml} :
+                        tweet.user.profile_image_url : The tweet users avatar,
+                        tweet.user.name: The Authors name,
+                        tweet.user.screen_name: The Authors screen name,
+                        tweet.htmlContent: The tweet text,
+                        tweet.retweeted_status.user.screen_name: The retweeted author.
+                        *
+                    */
+                    var timeline = '<div class="ui blue cen header">' + '<h4>' + 'Tweets Timeline' +                          '</h4>' +  '<div class="ui horizontal divider">'+ '-' +
+                        '</div>' + "</div>"
+                    $('#result').append(timeline);
 
-
+                    // Tweet object ForEach Loop with lodash.
                     _.each(tweets[0],function(tweet) {
 
-                        //for word frequencies
-                        var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
-                        var words_parse = initial_words.replace(/httpstc|RT/gi, "");
-                        var words = words_parse.split(' ');
-                        tweets_A.push(tweet.text);
+                        //for word frequencies -
+                        // clearing out twitter handles, links and hashtags
+                        // pushing the cleared result to an array tweets_A.
+                        if(tweet.text)  {
+                            var initial_words = tweet.text.replace(/[^a-zA-Z0-9 ]/g, "");
+                            var words_parse = initial_words.replace(/httpstc|RT/gi, "");
+                            var words = words_parse.split(' ');
+                            tweets_A.push(tweet.text);
 
-                        // for most active users
+                        // for most active users -
+                        // getting twitter handles and frequencies.
                         var user_pattern = (/\B@[a-z0-9_-]+/gi);
                         var user_mentions= tweet.text.match(user_pattern);
-                        _.each(user_mentions,function(users){ //console.log(users)
+                        _.each(user_mentions,function(users){
                             if (typeof userCounts[users] === 'undefined') {
                                 userCounts[users] = 1;
                             } else {
@@ -248,23 +294,20 @@
                             }
                         }); //users each
 
+                        // Pushing tweets to the browser.
                         var dateReadable, date;
                         dateReadable = new Date(Date.parse(tweet.created_at));
                         date = dateReadable.toDateString();
-                        // var tweetHtml = "<li>" + " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + '<br>'
-                        //         + "  Author: " + tweet.user.name + '&nbsp;' + "<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/"+ tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+ '&nbsp;'+ '\t\t' + '&nbsp;' + ' Date: ' + date + '<br> '
-                        //         + "  Tweet: " + tweet.htmlContent +
-                        //         (tweet.retweeted_status ? "<br>  Retweet: " +'@'+ tweet.retweeted_status.user.screen_name : "") + '<div class="ui divider">'+ "</li>";
-                        var tweetHtml = '<div class="ui list">' + '<div class="item">' +
-                                        " <img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" +
+                        var tweetHtml = '<div class="item">' +
+                                        "<img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" +
                                         '<div class="content">' + '<div class="header">' + "Author: " + tweet.user.name + '&nbsp;' +"<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/" + tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+
-                                            '&nbsp;'+ '\t\t' + '&nbsp;' + '</div>' + '<span class="date cen">' + ' Date: ' + date +  '</span>' + '<br>'+ '<br>'  + '<div class="description">' + "  Tweet: " + tweet.htmlContent +
-                                (tweet.retweeted_status ? "<br>  Retweet: " +'@'+
-                                tweet.retweeted_status.user.screen_name : "") +
-                                '<div class="ui divider">'+ '</div>' + '</div>' + '</div>';
+                                            '&nbsp;'+ '\t\t' + '&nbsp;' + '</div>' + '<span class="date cen">' + ' Date: ' + date +  '</span>' + '<br>'+ '<br>'  + '<div class="description">' + "  Tweet: " + tweet.htmlContent + (tweet.retweeted_status ? "<br>  Retweet: " +'@'+
+                                                    tweet.retweeted_status.user.screen_name : "") +'<div class="ui divider">'+ '</div>' + '</div>';
                         $('#result').append(tweetHtml); // sends the tweet object to the browser
                         $('#most_frequent_words').remove();
-                        // maps
+
+                        // Google Maps Implementation
+                        // getting coordinates.
                         tweetHTMLArray.push(tweetHtml);
                         if (tweet.geo != null ) {
                             var tweet_lat = tweet.geo.coordinates[0];
@@ -273,6 +316,7 @@
                             latCoordinates.push(tweet_lat);
                         }
 
+                        // ForEach Loop for getting word counts
                         _.each(words, function (word) {
 
                             if (flaggedWords.indexOf(word) === -1 && word != '') {
@@ -284,20 +328,24 @@
                             }
 
                         }); // words each
+                    }
 
                     }); //Tweet Each
 
+                    // pushing the words and frequency to MostUsedWords
                     for( var word in wordCounts){
                         mostUsedWords.push({word: word, count: wordCounts[word]});
                     }
-
+                    // pushing the users and frequency to MostActive Users
                     for (var user in userCounts){
                         mostActiveUsers.push({user: user, seen: userCounts[user]})
                     }
 
+                    // Sorting MostActiveUsers based on Counts -[seen]
                     mostActiveUsers.sort(function(a, b) { return b.seen - a.seen;});
-
+                    // Appending MostActiveUsers based on Counts to the browser
                     $('#counts').html('');
+                    $('#counts').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Most Active Users: ' + '</h4>' +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
                     for(var i= 0; i< 10; i++){
                         if (mostActiveUsers[i]){
                             $('#counts').append('<div id="most_active_users" class="">' +
@@ -308,17 +356,30 @@
                     }
 
                     var finalArray = [];
-
+                    // Sorting and Appending MostUsedWords based on counts to the browser
                     mostUsedWords.sort(function(a, b){ return b.count - a.count;});
-                    // $('#counts').append("<div id='head_words'>  " + 'Most Frequent Words: ' + " </div>");
-                    // for(var i= 0; i< 20; i++){
-                    //     if (mostUsedWords[i]) {
-                    //           console.info(mostUsedWords[i]);
-                    //          $('#counts').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" + mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") " + " </div>");
-                    //     }
-                    // }
+                     $('#words').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Most Frequent Words: ' + '</h4>' +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
+                     for(var i= 0; i< 20; i++){
+                         if (mostUsedWords[i]) {
+                              // console.info(mostUsedWords[i]);
+                              $('#words').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" +
+                                      mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") "
+                                      + " </div>");
+                         }
+                     }
 
-
+                    /**
+                    * Function to get the Most Active Users and moost used words
+                    * In relation to each other.
+                    *
+                    * @method activeUserAndKeywords
+                    * @param {array} tweets_A  - An array of tweets
+                    * @param {array} mostActiveUsers - An array of most active users
+                    * @param {array} mostUsedWords - An array of the most used words
+                    * @param {int}  tweet_counter - count of tweets associated with a user
+                    * @param {int} word_counter - count of words associated with a user
+                    * @return {Object} { User : info} where info is  {word : count}
+                    */
                     function activeUserAndKeywords(tweets_A, mostActiveUsers, mostUsedWords){
                         var tweet_counter = 0;  //for counting the tweets user is found in
                         var word_counter = 0; //for counting the words in the tweets
@@ -363,10 +424,19 @@
                     }
                     activeUserAndKeywords(tweets_A, mostActiveUsers, mostUsedWords);
 
-                    $('#count_result').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Active Users and Words: ' + '</h4>' + "</div>");
+                    // appending activeUserAndKeywords results to the browser
+                    $('#count_result').append("<div id='head_words' class='ui blue cen header'>" +
+                        "<h4>" + 'Active Users and Words: ' + '</h4>' +
+                        '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>" + '<br>');
                     for(var i= 0; i< 10; i++){
                         if (finalArray[i]) {
-                            $('#count_result').append("<div>" + " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name + "' href='http://twitter.com/" + finalArray[i].data.author.screen_name + "'>" + finalArray[i].data.author.screen_name + "</a>" + '&nbsp;&nbsp;  ' + '  ' + '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +'&nbsp;' + "<div class='ui blue cen'>" + "<h5>" + 'Most Frequent Words:' + '</h5>' + '<div class="ui fitted divider">'+ '</div>' + "</div>");
+                            $('#count_result').append("<div>" + " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name +
+                                "' href='http://twitter.com/" + finalArray[i].data.author.screen_name + "'>"
+                                + finalArray[i].data.author.screen_name + "</a>" + '&nbsp;&nbsp;  ' +
+                                '  ' + '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +
+                                '&nbsp;' + "<div class='ui blue cen'>" + "<h5>" +
+                                'Most Frequent Words:' + '</h5>' + '<div class="ui fitted divider">'
+                                + '</div>' + "</div>");
 
                            var sortedArray =  _.sortBy(_.uniqBy(finalArray[i].data.author.words, 'word'), ['count', 'word']);
                             _.eachRight(_.take(sortedArray,10), function (word) {
@@ -377,7 +447,7 @@
 
                     }
 
-                    /* Geo-location map*/
+                    /* Geo-location map */
                     function initialize() {
                         var mapCentre = new google.maps.LatLng(latCoordinates[0], longCoordinates[0]);
                         var mapOptions = {
@@ -404,14 +474,15 @@
                     else {
                         $('.gm-style').remove();
                         $('#no_locations').remove();
-                        $('#map-canvas').append("<h4 id='no_locations'> <br>Your search returned no geo-located tweets :( try again next time :) <\/h4>");
+                        $('#map-canvas').append("<div id='head_words' class='ui blue cen header'>" + "<h4 id='no_locations'>" + "<br>Your search returned no geo-located tweets :( try again next time :)" + "</h4>" +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>" + '<br>');
+
                     }
 
                 },
                 error: function(xhr, status, error) {
-                    //scrollToContent();
+                    scrollToContent();
                     console.log('Error: ' + error.message);
-                    $('#result').append('<li>' + 'Something went wrong sorry.' + '</li>'); // error output on webpage
+                    $('#result').append('<li>' + 'Something went wrong sorry.' + '</li>'); // error output on web page
                     //alert('error connecting');
                 }
             });
@@ -432,12 +503,10 @@
             });
             return o;
         };
-
+        // clearing initial web pages and sending query form to the server side.
         function sendData() {
-            $('#most_active_users').html('');
-            $('#most_frequent_words').html('');
-            $('#count_result').html('');
-            $('#db_info').html('');
+            $('#most_active_users').html(''); $('#most_frequent_words').html('');
+            $('#count_result').html(''); $('#db_info').html(''); $('#words').html('');
             var form = document.getElementById('myForm');
             sendAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
         }
@@ -450,6 +519,7 @@
     </div>
 </footer>
 <script>
+    // Form Validation with Jquery, Semantic UI and Regular expressions
     $('select.dropdown').dropdown();
     $('.ui.checkbox').checkbox();
     $('.ui.form').form({fields:
@@ -499,6 +569,7 @@
                 $(this).closest('.message').transition('fade');
             });
 </script>
+<script src="main.js"></script>
 </div>
 </body>
 </html>
