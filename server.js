@@ -273,12 +273,12 @@ http.createServer(function(req, res) {
                 // Performance: a bit faster because it's assigning the space in memory from start,
                 // without needed to assign for each dynamically added field
                 var db_entry = {
-                    query: queryString,
-                    queryOperator: queryOperator,
-                    queryTeamAuthoredTweets: qTATweets,
-                    queryTeamMentionedTweets: qTMTweets,
-                    queryPlayerAuthoredTweets: qPlATweets,
-                    queryPlayerMentionedTweets: qPlMTweets,
+                    query: ''+queryString,
+                    queryOperator: ''+queryOperator,
+                    queryTeamAuthoredTweets: ''+qTATweets,
+                    queryTeamMentionedTweets: ''+qTMTweets,
+                    queryPlayerAuthoredTweets: ''+qPlATweets,
+                    queryPlayerMentionedTweets: ''+qPlMTweets,
                     tweets: tweets
                 };
 
@@ -286,6 +286,7 @@ http.createServer(function(req, res) {
                 //so it does'nt modify the original data
                 var findQuery = JSON.parse(JSON.stringify(db_entry)); /*_.cloneDeep(db_entry);*/
                 delete findQuery.tweets;
+                console.log(JSON.stringify(findQuery)+'db_query')
 
                 //                                                 Check if it exists
                 // find(query) => [obj, obj1, obj2...]              if (res.length) { e } else { d }
@@ -342,8 +343,8 @@ http.createServer(function(req, res) {
                         console.log('Results returned by the database: ' + retrieved_count);
                         console.log('New tweets stored into database: ' + added_count);
                         var info = {
-                            count: retrieved_count || sTweets.length,
-                            added: added_count || sTweets.length
+                            count: retrieved_count,
+                            added: added_count
                         };
                         // [[tweet1, t2, t3, tN], { added: 42 }]
                         tweetObjects.push(sTweets, info);
