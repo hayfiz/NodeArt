@@ -137,7 +137,7 @@
         </div>
         </div>
     </form>
-    <!--search end here-->
+    <!--search ends here-->
 
 <!-- UI Messages -->
      <div class="ui message">
@@ -185,8 +185,26 @@
         </div>
     </div>
 </div>
-
     <a href="#0" class="cd-top">Top</a>
+</div>
+<!-- RDF Form -->
+<div>
+    <form id="rdfForm" onsubmit="return false;">
+        Date:<br>
+        <input type="text" name="Date" value="" placeholder="12.5.2016">
+        <br>
+        Team 1:<br>
+        <input type="text" name="Team1" value="" placeholder="Manchester United F.C.">
+        <br>
+        Team 2:<br>
+        <input type="text" name="Team2" value="" placeholder="Arsenal F.C.">
+        <br><br>
+        <button id="sendRDFButton">Send Data</button>
+    </form>
+</div>
+<!-- RDF Return content -->
+<div id="dbpContent">
+    
 </div>
 
     <script>
@@ -488,6 +506,59 @@
             });
 
         }
+
+        function sendRDFAjaxQuery(url, data) {
+        $.ajax({
+            type: 'POST',
+            url: 'rdfData.html',
+            dataType:'json',
+            data: data,
+            success: function (data) {
+                var teamInfo = data;
+                for (index in teamInfo) {
+                     $('#dbpContent').append(displayInfo(teamInfo[index]));
+                     // $('#dbpContent').append(playerInfo(teamInfo[index]));
+                    console.log((teamInfo[index]))
+                }
+                
+                
+                function displayInfo(info) {
+                    var teamName = $('<div id="rdfRet"></div>');
+                        teamName.append('<a href="'+info[0].teamlink.value+'"><h3>'+info[0].clubname.value+'</h3></a>') 
+                        teamName.append('<p>Description: '+info[0].abstract.value+'</p>')
+                        teamName.append('<p>Players: </p>')
+                        for (index in info) {
+                            teamName.append(playerInfo(info[index]));
+                        }
+                        teamName.append('<p>Manager: </p>')
+                        teamName.append('<img src="'+info[0].managerimg.value+'"/><br>')
+                        teamName.append('<a href="'+info[0].managerlink.value+'">'+info[0].managername.value+'</a>')
+                        teamName.append('<p>Stadium: </p>')
+                        teamName.append('<img src="'+info[0].stadiumimg.value+'"/><br>')
+                        teamName.append('<a href="'+info[0].stadiumlink.value+'">'+info[0].stadiumname.value+'</a>')
+                        teamName.append('<p>Description: '+info[0].stadiumdscr.value+'</p>')
+                    return teamName;
+                }
+
+                function playerInfo(info) {
+                    var playersTableDiv = $('<div class="cube"></div>');
+                        playersTableDiv.append('<img src="'+info.playerimg.value+'"/>');
+                        playersTableDiv.append('<p>Full Name: '+info.playername.value+'</p>')
+                        playersTableDiv.append('<p>DOB: '+info.playerdob.value+'</p>');
+                        playersTableDiv.append('<p>Position: '+info.playerpos.value+'</p>')
+                        playersTableDiv.append('<p>Height: '+info.playerheight.value+'m</p>')
+                    return playersTableDiv;
+                    // var playersTable = $('<table style="width:100%"></table');
+
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log('Error: ' + error.message);
+               alert('error connecting');
+            }
+        });
+    }
+
         $.fn.serializeObject = function() {
             var o = {};
             var a = this.serializeArray();
@@ -512,6 +583,14 @@
         }
         var sendButton = document.getElementById('sendButton');
         sendButton.onclick = sendData;
+
+        function sendRDFData() {
+            var form = document.getElementById('rdfForm');
+            sendRDFAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
+        }
+
+        var sendRDFButton = document.getElementById('sendRDFButton');
+        sendRDFButton.onclick = sendRDFData;
     </script>
 <footer>
     <div class="copyright">

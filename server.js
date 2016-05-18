@@ -12,6 +12,8 @@ var Twit = require('twit');
 var twitter = require('twitter-text');
 var mongojs = require('mongojs');
 var _ = require('lodash');
+var SparqlClient = require('sparql-client');
+var endpoint = 'http://dbpedia.org/sparql';
 
 // Credentials to access the Twitter Api hidden in a credentials folder.
 var credentials = require("./credentials");
@@ -286,7 +288,7 @@ http.createServer(function(req, res) {
                 //so it does'nt modify the original data
                 var findQuery = JSON.parse(JSON.stringify(db_entry)); /*_.cloneDeep(db_entry);*/
                 delete findQuery.tweets;
-                console.log(JSON.stringify(findQuery)+'db_query')
+                // console.log(JSON.stringify(findQuery)+'db_query')
 
                 //                                                 Check if it exists
                 // find(query) => [obj, obj1, obj2...]              if (res.length) { e } else { d }
@@ -383,6 +385,83 @@ http.createServer(function(req, res) {
                 getTweets(queryString, null, null, receivedTweets);
             }
         });
+    } else if ((req.method == 'POST') && (pathname == '/rdfData.html')) {
+        var body = '';
+        req.on('data', function(data) {
+            body += data;
+            // if body >  1e6 === 1 * Math.pow(10, 6) ~~~ 1MB
+            // flood attack or faulty client
+            // (code 413: req entity too large), kill req
+            if (body.length > 1e6) {
+                res.writeHead(413, {
+                    'Content-Type': 'text/plain'
+                }).end();
+                req.connection.destroy();
+            }
+        });
+        req.on('end', function() {
+            var data = JSON.parse(body);
+
+            for (index in data) {
+                var str = data[index]
+
+                data[index] = str.replace(/ /g, '_');
+            }
+
+            var resultData = {};
+            function getData(team) {
+                var query = "PREFIX dbpediaO: <http://dbpedia.org/ontology/>"+
+                            "PREFIX dbpediaP: <http://dbpedia.org/property/>"+
+                            "PREFIX prov: <http://www.w3.org/ns/prov#>"+
+                            "PREFIX dct:  <http://purl.org/dc/terms/>"+
+                            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"+
+
+                            "SELECT ?clubname ?abstract ?teamlink ?manager ?managername ?managerimg ?managerlink ?stadium ?stadiumname ?stadiumdscr ?stadiumimg ?stadiumlink ?players ?playername ?playerdob ?playerpos ?playerheight ?playerimg WHERE {"+
+                            "?team dbpediaP:clubname ?clubname."+
+                            "?team dbpediaO:abstract ?abstract."+
+                            "?team prov:wasDerivedFrom ?teamlink."+
+                            "?team dbpediaP:manager ?manager."+
+                            "?manager dbpediaP:fullname ?managername."+
+                            "?manager dbpediaO:thumbnail ?managerimg."+
+                            "?manager prov:wasDerivedFrom ?managerlink."+
+                            "?team dbpediaO:ground ?stadium."+
+                            "?stadium dbpediaP:name ?stadiumname."+
+                            "?stadium dbpediaO:abstract ?stadiumdscr."+
+                            "?stadium dbpediaO:thumbnail ?stadiumimg."+
+                            "?stadium prov:wasDerivedFrom ?stadiumlink."+
+                            "?team dbpediaP:name ?players."+
+                            "?players dbpediaP:fullname ?playername."+
+                            "?players dbpediaP:birthDate ?playerdob."+
+                            "?players dbpediaP:position ?playerpos."+
+                            "?players dbpediaO:height ?playerheight."+
+                            "?players dbpediaO:thumbnail ?playerimg."+
+                            "FILTER (lang(?abstract) = 'en')"+
+                            "FILTER (lang(?stadiumdscr) = 'en')"+
+                            "} ";
+                var client = new SparqlClient(endpoint);
+                console.log("Query to " + endpoint);
+                console.log("Query: "+ query);
+                client.query(query)
+                      .bind('team', '<http://dbpedia.org/resource/'+team+'>')
+                      .execute(function(error, results) {
+                        if (results) {
+                            complete++
+                            resultData[team] = results.results.bindings;
+                            console.log(resultData);
+                            if (complete <= 1) {
+                                getData(data.Team2);
+                            } else {
+                                res.end(JSON.stringify(resultData));
+                            }
+                            //console.log(JSON.stringify(results.results.bindings, null, 20));
+                        }
+                      })
+                      
+            };
+            var complete = 0;
+            getData(data.Team1);
+        });
+
     } else {
         // Handles server errors.
         file.serve(req, res, function(err, result) {
