@@ -417,7 +417,7 @@ http.createServer(function(req, res) {
                             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"+
                             "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"+
 
-                            "SELECT ?clubname ?abstract ?teamlink ?manager ?managername ?managerimg ?managerlink ?stadium ?stadiumname ?stadiumdscr ?stadiumimg ?stadiumlink ?players ?playername ?playerdob ?playerpos ?playerheight ?playerimg WHERE {"+
+                            "SELECT ?clubname ?abstract ?teamlink ?manager ?managername ?managerimg ?managerlink ?stadium ?stadiumname ?stadiumdscr ?stadiumimg ?stadiumlink ?players ?playertopicof ?playername ?playerdob ?playerpos ?playerheight ?playerimg WHERE {"+
                             "?team dbpediaP:clubname ?clubname."+
                             "?team dbpediaO:abstract ?abstract."+
                             "?team prov:wasDerivedFrom ?teamlink."+
@@ -431,6 +431,7 @@ http.createServer(function(req, res) {
                             "?stadium dbpediaO:thumbnail ?stadiumimg."+
                             "?stadium prov:wasDerivedFrom ?stadiumlink."+
                             "?team dbpediaP:name ?players."+
+                            "?players <http://xmlns.com/foaf/0.1/isPrimaryTopicOf> ?playertopicof."+
                             "OPTIONAL {?players dbpediaP:fullname ?playername.}"+
                             "?players dbpediaP:birthDate ?playerdob."+
                             "?players dbpediaP:position ?playerpos."+
