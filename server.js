@@ -415,22 +415,23 @@ http.createServer(function(req, res) {
                             "PREFIX prov: <http://www.w3.org/ns/prov#>"+
                             "PREFIX dct:  <http://purl.org/dc/terms/>"+
                             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"+
+                            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"+
 
                             "SELECT ?clubname ?abstract ?teamlink ?manager ?managername ?managerimg ?managerlink ?stadium ?stadiumname ?stadiumdscr ?stadiumimg ?stadiumlink ?players ?playername ?playerdob ?playerpos ?playerheight ?playerimg WHERE {"+
                             "?team dbpediaP:clubname ?clubname."+
                             "?team dbpediaO:abstract ?abstract."+
                             "?team prov:wasDerivedFrom ?teamlink."+
                             "?team dbpediaP:manager ?manager."+
-                            "?manager dbpediaP:fullname ?managername."+
-                            "?manager dbpediaO:thumbnail ?managerimg."+
-                            "?manager prov:wasDerivedFrom ?managerlink."+
+                            "OPTIONAL {?manager dbpediaP:fullname ?managername.}"+
+                            "OPTIONAL {?manager dbpediaO:thumbnail ?managerimg.}"+
+                            "OPTIONAL {?manager prov:wasDerivedFrom ?managerlink.}"+
                             "?team dbpediaO:ground ?stadium."+
-                            "?stadium dbpediaP:name ?stadiumname."+
+                            "OPTIONAL {?stadium dbpediaP:name ?stadiumname.}"+
                             "?stadium dbpediaO:abstract ?stadiumdscr."+
                             "?stadium dbpediaO:thumbnail ?stadiumimg."+
                             "?stadium prov:wasDerivedFrom ?stadiumlink."+
                             "?team dbpediaP:name ?players."+
-                            "?players dbpediaP:fullname ?playername."+
+                            "OPTIONAL {?players dbpediaP:fullname ?playername.}"+
                             "?players dbpediaP:birthDate ?playerdob."+
                             "?players dbpediaP:position ?playerpos."+
                             "?players dbpediaO:height ?playerheight."+
@@ -447,10 +448,14 @@ http.createServer(function(req, res) {
                         if (results) {
                             complete++
                             resultData[team] = results.results.bindings;
-                            console.log(resultData);
+                            resultData[team].push({teamDBPName: team})
+                            
+                            
                             if (complete <= 1) {
                                 getData(data.Team2);
                             } else {
+                                //console.log(JSON.stringify(results.results.bindings, null, 20));
+                                console.log(JSON.stringify(resultData[team], null, 20));
                                 res.end(JSON.stringify(resultData));
                             }
                             //console.log(JSON.stringify(results.results.bindings, null, 20));

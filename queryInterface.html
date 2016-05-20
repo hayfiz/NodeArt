@@ -1,5 +1,11 @@
 <!DOCTYPE HTML>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:dbo="http://dbpedia.org/ontology/"
+    xmlns:dbp="http://dbpedia.org/ontology/"
+    xmlns:dbr="http://dbpedia.org/resource/" 
+    xmlns:prov="http://www.w3.org/ns/prov#"
+    xmlns:xml="http://www.w3.org/XML/1998/namespace"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/">
 <head>
     <title>Node Tweets | Home</title>
     <!-- Custom Theme files -->
@@ -515,38 +521,64 @@
             data: data,
             success: function (data) {
                 var teamInfo = data;
+                console.log(teamInfo);
                 for (index in teamInfo) {
                      $('#dbpContent').append(displayInfo(teamInfo[index]));
                      // $('#dbpContent').append(playerInfo(teamInfo[index]));
-                    console.log((teamInfo[index]))
                 }
                 
                 
                 function displayInfo(info) {
-                    var teamName = $('<div id="rdfRet"></div>');
-                        teamName.append('<a href="'+info[0].teamlink.value+'"><h3>'+info[0].clubname.value+'</h3></a>') 
-                        teamName.append('<p>Description: '+info[0].abstract.value+'</p>')
-                        teamName.append('<p>Players: </p>')
+                    var teamName = $('<div id="rdfRet" about="'+info[info.length-1].teamDBPName+'"></div>');
+                        teamName.append('<a href="'+info[0].teamlink.value+'" class="'+info[0].teamlink.type+'"><h3 property="dbp:clubname" xml:lang="'+info[0].clubname["xml:lang"]+'" class="'+info[0].clubname.type+'">'+info[0].clubname.value+'</h3></a>') 
+                        teamName.append('<p property="dbo:abstract" xml:lang="'+info[0].abstract["xml:lang"]+'" class="'+info[0].abstract.type+'" >Description: '+info[0].abstract.value+'</p>')
+                        var players = $('<div property="dbp:name"></div>');
+                            players.append('<p>Players: </p>')
                         for (index in info) {
-                            teamName.append(playerInfo(info[index]));
+                            players.append(playerInfo(info[index]));
                         }
+                        teamName.append(players);
                         teamName.append('<p>Manager: </p>')
-                        teamName.append('<img src="'+info[0].managerimg.value+'"/><br>')
-                        teamName.append('<a href="'+info[0].managerlink.value+'">'+info[0].managername.value+'</a>')
+                        if (info[0].managerimg!= undefined) {
+                                                teamName.append('<img src="'+info[0].managerimg.value+'"/><br>')
+                                                }
+
+                         if (info[0].managerlink!= undefined && info[0].managername!= undefined) {
+                            teamName.append('<a href="'+info[0].managerlink.value+'" class="'+info[0].managerlink.type+'"><p property="dbp:fullname" class="'+info[0].managername.type+'" xml:lang="'+info[0].managername["xml:lang"]+'">'+info[0].managername.value+'</p></a>')
+                         } else if(info[0].managername!= undefined){
+                            teamName.append('<p property="dbp:fullname" class="'+info[0].managername.type+'" xml:lang="'+info[0].managername["xml:lang"]+'">'+info[0].managername.value+'</p>')
+                         }
+                        
                         teamName.append('<p>Stadium: </p>')
-                        teamName.append('<img src="'+info[0].stadiumimg.value+'"/><br>')
-                        teamName.append('<a href="'+info[0].stadiumlink.value+'">'+info[0].stadiumname.value+'</a>')
-                        teamName.append('<p>Description: '+info[0].stadiumdscr.value+'</p>')
+                        teamName.append('<img src="'+info[0].stadiumimg.value+'" class="'+info[0].stadiumimg.type+'"/><br>')
+                        if(info[0].stadiumname != undefined) {
+                         teamName.append('<a href="'+info[0].stadiumlink.value+'" class="'+info[0].stadiumlink.type+'" ><p property="dbp:name" class="'+info[0].stadiumname.type+'" xml:lang="'+info[0].stadiumname["xml:lang"]+'">'+info[0].stadiumname.value+'</p></a>')
+                        }
+                       
+                        teamName.append('<p property="dbo:abstract" class="'+info[0].stadiumdscr.type+'" xml:lang="'+info[0].stadiumdscr["xml:lang"]+'">Description: '+info[0].stadiumdscr.value+'</p>')
                     return teamName;
                 }
 
                 function playerInfo(info) {
-                    var playersTableDiv = $('<div class="cube"></div>');
-                        playersTableDiv.append('<img src="'+info.playerimg.value+'"/>');
-                        playersTableDiv.append('<p>Full Name: '+info.playername.value+'</p>')
-                        playersTableDiv.append('<p>DOB: '+info.playerdob.value+'</p>');
-                        playersTableDiv.append('<p>Position: '+info.playerpos.value+'</p>')
-                        playersTableDiv.append('<p>Height: '+info.playerheight.value+'m</p>')
+                    var playersTableDiv = $('<div class="cube" rel="dbp:name"></div>');
+                        if (info.playerimg != undefined) {
+                        playersTableDiv.append('<img src="'+info.playerimg.value+'"  rel="foaf:depiction"/>');
+                        }
+                        if (info.playername != undefined) {
+                            playersTableDiv.append('<p property="dbp:fullname" xml:lang="'+info.playername["xml:lang"]+'" class="'+info.playername.type+'">Full Name: '+info.playername.value+'</p>')
+                        }
+                        if (info.playerdob != undefined) {
+                        playersTableDiv.append('<p property="dbo:birthDate" datatype="'+info.playerdob.datatype+'" class="'+info.playerdob.type+'" >DOB: '+info.playerdob.value+'</p>');
+                        }
+                        if (info.playerpos != undefined) {
+                            var str = info.playerpos.value;
+                            var str2 = str.replace('http://dbpedia.org/resource/', '');
+                            var pos = str2.replace(/_/g,' '); 
+                        playersTableDiv.append('<p>Position: <a href="'+info.playerpos.value+'" property="dbo:position" class="'+info.playerpos.type+'">'+pos+'</a></p>')
+                        }
+                        if (info.playerheight != undefined) {
+                        playersTableDiv.append('<p property="dbo:height" class="'+info.playerheight.type+'">Height: '+info.playerheight.value+'m</p>')
+                    }
                     return playersTableDiv;
                     // var playersTable = $('<table style="width:100%"></table');
 
