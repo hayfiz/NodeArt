@@ -134,7 +134,7 @@
             </div>
             <!-- Form Fields End -->
             <!-- Submit Button -->
-        <button id="sendButton" tabindex="0">Search Twitter</button>
+        <button class="ui primary large button" id="sendButton" tabindex="0">Search Twitter</button>
         <!-- Error/ Validation Massages -->
         <div class="ui error message">
             <ul class="list"></ul>
@@ -144,9 +144,12 @@
         </div>
     </form>
     <!--search ends here-->
+
     <form class="ui form" id="rdfPlayerForm" onsubmit="return false;" name="rdfForm">
-       <div class="ui equal width form">
-            <div class="fields">
+     <div class="ui segment">
+       <div class="ui form">
+       <h4 class="ui dividing header">Team Information</h4>
+            <div class="three fields">
                 <div class="field">
                     <label>Date:</label>
                     <input type="text" name="Date" placeholder="12.5.2016">
@@ -158,13 +161,19 @@
                 <div class="field">
                     <label>Team 2:</label>
                     <input type="text" name="Team2" placeholder="Arsenal F.C." >
-                </div><br><br>
-                <button class="ui primary large button" id="sendTeamRDFButton" tabindex="1">Send Data</button> <br><br>
-                <div class="field">
+                </div>
+            </div>
+            <button class="ui primary button" id="sendTeamRDFButton" tabindex="1">Send Data</button>
+            </div>
+            <br>
+            <div class="ui form">
+            <h4 class="ui dividing header">Player Information</h4>
+             <div class="field">
                     <label>Player:</label>
-                        <input type="text" name="Player" value="" placeholder="Wayne Rooney" /></div>
-                <button class="ui primary large button" id="sendPlayerRDFButton" tabindex="2">Send Data</button>
-            </div> 
+                    <input type="text" name="Player" value="" placeholder="Wayne Rooney" />
+            </div>
+                <button class="ui primary button" id="sendPlayerRDFButton" tabindex="2">Send Data</button>
+            </div>
             </div>
     </form>
 <!-- UI Messages -->
@@ -185,65 +194,43 @@
         </div>
     </div>
 
-<div class="ui segment">
+<!-- <div class="ui segment">
         <div class="content">
           <div id="map-canvas" style="width:auto;%;height:300pt;align:center;"></div>
           <div id="flickr_photos"></div>
         </div>
+</div> -->
+<div class="spacer">
+<div id="map-canvas"> </div>
+<div id="map_divider"></div>
+<br>
 </div>
-<div class="ui horizontal divider"> <i class="huge loading map icon"></i></div>
+
 <div class="ui three column divided grid" id="content">
+
     <div class="row">
-        <div class=" five wide column">
-            <div class="ui segment">
-                <div id="count_result"></div>
-            </div>
-        </div>
-        <div class="eight wide column">
-            <div class="ui segment">
-                <div id="result" class="ui relaxed  devided list"></div>
-            </div>
-        </div>
+    <div class=" five wide column">
+            <div id="count_result"></div>
+    </div>
+     <div class="eight wide column">
+            <div id="result" class="ui relaxed  devided list"></div>
+    </div>
         <div class=" three wide column">
-            <div class="ui stacked segment">
+            <!-- <div class="ui segment"> -->
                 <div id="counts"></div>
-            </div>
-            <div class="ui stacked segment">
+           <!--  </div> -->
+            <!-- <div class="ui segment"> -->
                 <div id="words"></div>
-            </div>
+           <!--  </div> -->
         </div>
     </div>
-    
 </div>
     <a href="#0" class="cd-top">Top</a>
 </div>
- <!-- Team RDF Form -->
-<!-- <div>
-    <form id="rdfTeamForm" onsubmit="return false;">
-        Date:<br>
-        <input type="text" name="Date" value="" placeholder="12.5.2016">
-        <br>
-        Team 1:<br>
-        <input type="text" name="Team1" value="" placeholder="Manchester United F.C.">
-        <br>
-        Team 2:<br>
-        <input type="text" name="Team2" value="" placeholder="Arsenal F.C.">
-        <br><br>
-        <button id="sendTeamRDFButton">Send Data</button>
-    </form>
-</div> -->
-<!-- Player RDF Form -->
-<!-- <div>
-    <form id="rdfPlayerForm" onsubmit="return false;">
-        Player:<br>
-        <input type="text" name="Player" value="" placeholder="Wayne Rooney" />
-        <br><br>
-        <button id="sendPlayerRDFButton">Send Data</button>
-    </form>
-</div>  -->
+
 <!-- RDF Return content -->
 <div id="dbpContent">
-    
+
 </div>
 
     <script>
@@ -367,12 +354,13 @@
                         var dateReadable, date;
                         dateReadable = new Date(Date.parse(tweet.created_at));
                         date = dateReadable.toDateString();
-                        var tweetHtml = '<div class="item">' +
-                                        "<img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" +
-                                        '<div class="content">' + '<div class="header">' + "Author: " + tweet.user.name + '&nbsp;' +"<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/" + tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+
+                        var tweetdiv = $('<div id="tweet_div" class="ui segments"> </div>');
+                        var tweetHtml = '<div class="ui segment item ">' +
+                                        '<div class="content">' + '<div class="header">'+ "<img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + "Author: " + tweet.user.name + '&nbsp;' +"<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/" + tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+
                                             '&nbsp;'+ '\t\t' + '&nbsp;' + '</div>' + '<span class="date cen">' + ' Date: ' + date +  '</span>' + '<br>'+ '<br>'  + '<div class="description">' + "  Tweet: " + tweet.htmlContent + (tweet.retweeted_status ? "<br>  Retweet: " +'@'+
-                                                    tweet.retweeted_status.user.screen_name : "") +'<div class="ui divider">'+ '</div>' + '</div>';
-                        $('#result').append(tweetHtml); // sends the tweet object to the browser
+                                                    tweet.retweeted_status.user.screen_name : "") + '</div>';
+                        $('#tweet_div').append(tweetHtml);
+                        $('#result').append(tweetdiv); // sends the tweet object to the browser
                         $('#most_frequent_words').remove();
 
                         // Google Maps Implementation
@@ -417,10 +405,12 @@
                     $('#counts').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Most Active Users: ' + '</h4>' +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
                     for(var i= 0; i< 10; i++){
                         if (mostActiveUsers[i]){
-                            $('#counts').append('<div id="most_active_users" class="">' +
+                            var countsdiv = $('<div id="counts_div" class="ui segment"> </div>');
+                            $('#counts_div').append('<div id="most_active_users" class="">' +
                                     "<a title='" + mostActiveUsers[i].user + "' href='http://twitter.com/" +
                                     mostActiveUsers[i].user + "'>" + mostActiveUsers[i].user + '&nbsp;' +
                                     "</a>" +' (' + mostActiveUsers[i].seen + ')');
+                            $('#counts').append(countsdiv);
                         }
                     }
 
@@ -430,10 +420,12 @@
                      $('#words').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Most Frequent Words: ' + '</h4>' +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
                      for(var i= 0; i< 20; i++){
                          if (mostUsedWords[i]) {
+                            var worddiv = $('<div id="words_div" class="ui segment"> </div>');
                               // console.info(mostUsedWords[i]);
-                              $('#words').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" +
+                              $('#words_div').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" +
                                       mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") "
                                       + " </div>");
+                              $('#words').append(worddiv);
                          }
                      }
 
@@ -496,25 +488,27 @@
                     // appending activeUserAndKeywords results to the browser
                     $('#count_result').append("<div id='head_words' class='ui blue cen header'>" +
                         "<h4>" + 'Active Users and Words: ' + '</h4>' +
-                        '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>" + '<br>');
+                        '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
+                    var worddiv = $('<div id="words_div" class="ui segments"> </div>');
                     for(var i= 0; i< 10; i++){
                         if (finalArray[i]) {
-                            $('#count_result').append("<div>" + " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name +
+                            $('#words_div').append("<div class='ui segment'>"+ " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name +
                                 "' href='http://twitter.com/" + finalArray[i].data.author.screen_name + "'>"
                                 + finalArray[i].data.author.screen_name + "</a>" + '&nbsp;&nbsp;  ' +
-                                '  ' + '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +
+                                '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +
                                 '&nbsp;' + "<div class='ui blue cen'>" + "<h5>" +
-                                'Most Frequent Words:' + '</h5>' + '<div class="ui fitted divider">'
-                                + '</div>' + "</div>");
+                                'Most Frequent Words:' + '</h5>' + "</div>");
 
                            var sortedArray =  _.sortBy(_.uniqBy(finalArray[i].data.author.words, 'word'), ['count', 'word']);
                             _.eachRight(_.take(sortedArray,10), function (word) {
-                                $('#count_result').append('<div>' + word.word + '&nbsp;' + '  ' + '(' + word.count + ')'+" </div>");
+                                $('#words_div').append("<div class='ui segment'>"+ '<div>' + word.word + '&nbsp;' + '  ' + '(' + word.count + ')'+" </div>"+" </div>");
                                  });
-                            $('#count_result').append('<div class="ui divider"></div>');
+                            $('words_div').append('<div class="ui divider"></div>');
+                            $('#count_result').append(worddiv)
                         }
 
                     }
+
 
                     /* Geo-location map */
                     function initialize() {
@@ -543,7 +537,8 @@
                     else {
                         $('.gm-style').remove();
                         $('#no_locations').remove();
-                        $('#map-canvas').append("<div id='head_words' class='ui blue cen header'>" + "<h4 id='no_locations'>" + "<br>Your search returned no geo-located tweets :( try again next time :)" + "</h4>" +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>" + '<br>');
+                        $('#map-canvas').append("<div class='ui segment'>" + "<div class='content'>" +"<div id='head_words' class='ui blue cen header'>" + "<h4 id='no_locations'>" + "<br>Your search returned no geo-located tweets :( try again next time :)" + "</h4>" +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>" + "</div>" + "</div>" + '<br>');
+                        $('#map_divider').append("<div class='ui horizontal divider'>" + "<i class='huge loading map icon'>" + "</i>" + "</div>"+ '<br>');
 
                     }
 

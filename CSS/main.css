@@ -143,3 +143,9 @@ hr{
     bottom: 30px;
   }
 }
+
+#map-canvas{
+width:auto;
+height:300pt;
+align:center;
+}
