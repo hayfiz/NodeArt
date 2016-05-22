@@ -385,7 +385,7 @@ http.createServer(function(req, res) {
                 getTweets(queryString, null, null, receivedTweets);
             }
         });
-    } else if ((req.method == 'POST') && (pathname == '/rdfData.html')) {
+    } else if ((req.method == 'POST') && (pathname == '/rdfTeamData.html')) {
         var body = '';
         req.on('data', function(data) {
             body += data;
@@ -403,8 +403,7 @@ http.createServer(function(req, res) {
             var data = JSON.parse(body);
 
             for (index in data) {
-                var str = data[index]
-
+                var str = data[index];
                 data[index] = str.replace(/ /g, '_');
             }
 
@@ -462,12 +461,45 @@ http.createServer(function(req, res) {
                             //console.log(JSON.stringify(results.results.bindings, null, 20));
                         }
                       })
+
                       
             };
             var complete = 0;
             getData(data.Team1);
         });
 
+    } else if ((req.method == 'POST') && (pathname == '/rdfPlayerData.html')) {
+        var body = '';
+        req.on('data', function(data) {
+            body += data;
+            // if body >  1e6 === 1 * Math.pow(10, 6) ~~~ 1MB
+            // flood attack or faulty client
+            // (code 413: req entity too large), kill req
+            if (body.length > 1e6) {
+                res.writeHead(413, {
+                    'Content-Type': 'text/plain'
+                }).end();
+                req.connection.destroy();
+            }
+        });
+        req.on('end', function() {
+            var data = JSON.parse(body);
+
+            for (index in data) {
+                var str = data[index];
+                data[index] = str.replace(/ /g, '_');
+            }
+
+            function getData(player) {
+                var query = ;
+                var client = new SparqlClient(endpoint);
+                console.log("Query to " + endpoint);
+                console.log("Query: "+ query);
+
+            }
+
+                      })
+                      
     } else {
         // Handles server errors.
         file.serve(req, res, function(err, result) {

@@ -193,9 +193,9 @@
 </div>
     <a href="#0" class="cd-top">Top</a>
 </div>
-<!-- RDF Form -->
+<!-- Team RDF Form -->
 <div>
-    <form id="rdfForm" onsubmit="return false;">
+    <form id="rdfTeamForm" onsubmit="return false;">
         Date:<br>
         <input type="text" name="Date" value="" placeholder="12.5.2016">
         <br>
@@ -205,7 +205,16 @@
         Team 2:<br>
         <input type="text" name="Team2" value="" placeholder="Arsenal F.C.">
         <br><br>
-        <button id="sendRDFButton">Send Data</button>
+        <button id="sendTeamRDFButton">Send Data</button>
+    </form>
+</div>
+<!-- Player RDF Form -->
+<div>
+    <form id="rdfPlayerForm" onsubmit="return false;">
+        Player:<br>
+        <input type="text" name="Player" value="" placeholder="Wayne Rooney" />
+        <br><br>
+        <button id="sendPlayerRDFButton">Send Data</button>
     </form>
 </div>
 <!-- RDF Return content -->
@@ -513,15 +522,14 @@
 
         }
 
-        function sendRDFAjaxQuery(url, data) {
+        function sendTeamRDFAjaxQuery(url, data) {
         $.ajax({
             type: 'POST',
-            url: 'rdfData.html',
+            url: 'rdfTeamData.html',
             dataType:'json',
             data: data,
             success: function (data) {
                 var teamInfo = data;
-                console.log(teamInfo);
                 for (index in teamInfo) {
                      $('#dbpContent').append(displayInfo(teamInfo[index]));
                      // $('#dbpContent').append(playerInfo(teamInfo[index]));
@@ -534,9 +542,7 @@
                     var stadiumuri = info[0].stadium.value;
                     var stadiumRDF = stadiumuri.replace('http://dbpedia.org/resource/','');
 
-                    console.log(manager);
-
-                    var teamName = $('<div id="rdfRet" about="dbr:'+info[info.length-1].teamDBPName+'"></div>');
+                    var teamName = $('<div id="TeamRDFa" about="dbr:'+info[info.length-1].teamDBPName+'"></div>');
                         teamName.append('<a href="'+info[0].teamlink.value+'" class="'+info[0].teamlink.type+'"><h3 property="dbp:clubname" xml:lang="'+info[0].clubname["xml:lang"]+'" class="'+info[0].clubname.type+'">'+info[0].clubname.value+'</h3></a>') 
                         teamName.append('<p property="dbo:abstract" xml:lang="'+info[0].abstract["xml:lang"]+'" class="'+info[0].abstract.type+'" >Description: '+info[0].abstract.value+'</p>')
                         var players = $('<div property="dbp:name"></div>');
@@ -617,8 +623,111 @@
                alert('error connecting');
             }
         });
+        
     }
 
+        function sendPlayerRDFAjaxQuery(url, data) {
+            $.ajax({
+            type: 'POST',
+            url: 'rdfPlayerData.html',
+            dataType:'json',
+            data: data,
+            success: function (data) {
+                var teamInfo = data;
+                // for (index in teamInfo) {
+                //      $('#dbpContent').append(displayInfo(teamInfo[index]));
+                //      // $('#dbpContent').append(playerInfo(teamInfo[index]));
+                // }
+                
+                
+                // function displayInfo(info) {
+                //     var manageruri = info[0].manager.value;
+                //     var managerRDF = manageruri.replace('http://dbpedia.org/resource/','');
+                //     var stadiumuri = info[0].stadium.value;
+                //     var stadiumRDF = stadiumuri.replace('http://dbpedia.org/resource/','');
+
+                //     var teamName = $('<div id="TeamRDFa" about="dbr:'+info[info.length-1].teamDBPName+'"></div>');
+                //         teamName.append('<a href="'+info[0].teamlink.value+'" class="'+info[0].teamlink.type+'"><h3 property="dbp:clubname" xml:lang="'+info[0].clubname["xml:lang"]+'" class="'+info[0].clubname.type+'">'+info[0].clubname.value+'</h3></a>') 
+                //         teamName.append('<p property="dbo:abstract" xml:lang="'+info[0].abstract["xml:lang"]+'" class="'+info[0].abstract.type+'" >Description: '+info[0].abstract.value+'</p>')
+                //         var players = $('<div property="dbp:name"></div>');
+                //             players.append('<p>Players: </p>')
+                //         for (index in info) {
+                //             if (index != (info.length-1)) {
+                //             players.append(playerInfo(info[index]));
+                //                                     }
+                //         }
+                //         teamName.append(players);
+                //         var managerDiv = $('<div property="dbo:manager"></div>');
+                //         var manager = $('<div about="dbr:'+managerRDF+'" class="'+info[0].manager.type+'"></div>');
+                //         manager.append('<p>Manager: </p>')
+                //         if (info[0].managerimg!= undefined) {
+                //                                 manager.append('<img src="'+info[0].managerimg.value+'" property="dbo:thumbnail" rel="foaf:depiction" class="'+info[0].managerimg.type+'"/><br>')
+                //                                 }
+
+                //          if (info[0].managerlink!= undefined && info[0].managername!= undefined) {
+                //             manager.append('<a href="'+info[0].managerlink.value+'" class="'+info[0].managerlink.type+'"><p property="dbp:fullname" class="'+info[0].managername.type+'" xml:lang="'+info[0].managername["xml:lang"]+'">'+info[0].managername.value+'</p></a>')
+                //          } else if(info[0].managername!= undefined){
+                //             manager.append('<p property="dbp:fullname" class="'+info[0].managername.type+'" xml:lang="'+info[0].managername["xml:lang"]+'">'+info[0].managername.value+'</p>')
+                //          }
+
+
+                //          managerDiv.append(manager);
+                //          teamName.append(managerDiv);
+                        
+                //         var stadiumDiv = $('<div property="dbo:ground"></div>');
+                //         var stadium = $('<div about="'+stadiumRDF+'" class="'+info[0].stadium.type+'"></div>');
+
+                //         stadium.append('<p>Stadium: </p>')
+                //         stadium.append('<img src="'+info[0].stadiumimg.value+'" class="'+info[0].stadiumimg.type+'" property="dbo:thumbnail" rel="foaf:depiction"/><br>')
+                //         if(info[0].stadiumname != undefined) {
+                //          stadium.append('<a href="'+info[0].stadiumlink.value+'" class="'+info[0].stadiumlink.type+'" ><p property="dbp:name" class="'+info[0].stadiumname.type+'" xml:lang="'+info[0].stadiumname["xml:lang"]+'">'+info[0].stadiumname.value+'</p></a>')
+                //         }
+                       
+                //         stadium.append('<p property="dbo:abstract" class="'+info[0].stadiumdscr.type+'" xml:lang="'+info[0].stadiumdscr["xml:lang"]+'">Description: '+info[0].stadiumdscr.value+'</p>');
+
+                //         stadiumDiv.append(stadium);
+                //         teamName.append(stadiumDiv);
+
+                //     return teamName;
+                // }
+
+                // function playerInfo(info) {
+                //     var playeruri = info.players.value;
+                //     var playerRDF = playeruri.replace('http://dbpedia.org/resource/','');
+
+
+                //     var playersTableDiv = $('<div about="dbr:'+playerRDF+'" class="'+info.players.type+'" rel="dbp:name"></div>');
+                //         if (info.playerimg != undefined) {
+                //         playersTableDiv.append('<img src="'+info.playerimg.value+'" property="dbo:thumbnail" rel="foaf:depiction"/>');
+                //         }
+                //         if (info.playername != undefined) {
+                //             playersTableDiv.append('<p property="dbp:fullname" xml:lang="'+info.playername["xml:lang"]+'" class="'+info.playername.type+'">Full Name: '+info.playername.value+'</p>')
+                //         }
+                //         if (info.playerdob != undefined) {
+                //         playersTableDiv.append('<p property="dbo:birthDate" datatype="'+info.playerdob.datatype+'" class="'+info.playerdob.type+'" >DOB: '+info.playerdob.value+'</p>');
+                //         }
+                //         if (info.playerpos != undefined) {
+                //             var str = info.playerpos.value;
+                //             var str2 = str.replace('http://dbpedia.org/resource/', '');
+                //             var pos = str2.replace(/_/g,' ');
+                //         playersPosDiv = $('<div about="dbr:'+str2+'"></div>') 
+                //         playersPosDiv.append('<p>Position: <a href="'+info.playerpos.value+'" property="dbo:position" class="'+info.playerpos.type+'">'+pos+'</a></p>')
+                //         playersTableDiv.append(playersPosDiv);
+                //         }
+                //         if (info.playerheight != undefined) {
+                //         playersTableDiv.append('<p property="dbo:height" class="'+info.playerheight.type+'">Height: '+info.playerheight.value+'m</p>')
+                //     }
+                //     return playersTableDiv;
+                    // var playersTable = $('<table style="width:100%"></table');
+
+                // }
+            },
+            error: function (xhr, status, error) {
+                console.log('Error: ' + error.message);
+               alert('error connecting');
+            }
+        });
+        }
         $.fn.serializeObject = function() {
             var o = {};
             var a = this.serializeArray();
@@ -644,13 +753,21 @@
         var sendButton = document.getElementById('sendButton');
         sendButton.onclick = sendData;
 
-        function sendRDFData() {
-            var form = document.getElementById('rdfForm');
-            sendRDFAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
+        function sendTeamRDFData() {
+            var form = document.getElementById('rdfTeamForm');
+            sendTeamRDFAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
         }
 
-        var sendRDFButton = document.getElementById('sendRDFButton');
-        sendRDFButton.onclick = sendRDFData;
+        var sendTeamRDFButton = document.getElementById('sendTeamRDFButton');
+        sendTeamRDFButton.onclick = sendTeamRDFData;
+
+        function sendPlayerRDFData() {
+            var form = document.getElementById('rdfPlayerForm');
+            sendPlayerRDFAjaxQuery('http://localhost:3000/', JSON.stringify($('form').serializeObject()));
+        }
+
+        var sendPlayerRDFButton = document.getElementById('sendPlayerRDFButton');
+        sendPlayerRDFButton.onclick = sendPlayerRDFData;
     </script>
 <footer>
     <div class="copyright">
