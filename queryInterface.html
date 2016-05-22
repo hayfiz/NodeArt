@@ -134,7 +134,7 @@
             </div>
             <!-- Form Fields End -->
             <!-- Submit Button -->
-        <button class="ui primary large button" id="sendButton" tabindex="0">Search Twitter</button>
+        <button id="sendButton" tabindex="0">Search Twitter</button>
         <!-- Error/ Validation Massages -->
         <div class="ui error message">
             <ul class="list"></ul>
@@ -144,7 +144,29 @@
         </div>
     </form>
     <!--search ends here-->
-
+    <form class="ui form" id="rdfPlayerForm" onsubmit="return false;" name="rdfForm">
+       <div class="ui equal width form">
+            <div class="fields">
+                <div class="field">
+                    <label>Date:</label>
+                    <input type="text" name="Date" placeholder="12.5.2016">
+                </div>
+                <div class="field">
+                    <label>Team 1:</label>
+                    <input type="text" name="Team1" placeholder="Manchester United F.C." >
+                </div>
+                <div class="field">
+                    <label>Team 2:</label>
+                    <input type="text" name="Team2" placeholder="Arsenal F.C." >
+                </div><br><br>
+                <button class="ui primary large button" id="sendTeamRDFButton" tabindex="1">Send Data</button> <br><br>
+                <div class="field">
+                    <label>Player:</label>
+                        <input type="text" name="Player" value="" placeholder="Wayne Rooney" /></div>
+                <button class="ui primary large button" id="sendPlayerRDFButton" tabindex="2">Send Data</button>
+            </div> 
+            </div>
+    </form>
 <!-- UI Messages -->
      <div class="ui message">
         <div class="header">
@@ -165,7 +187,8 @@
 
 <div class="ui segment">
         <div class="content">
-          <div id="map-canvas" style="width:auto;%;height:300pt;align:center;"/>
+          <div id="map-canvas" style="width:auto;%;height:300pt;align:center;"></div>
+          <div id="flickr_photos"></div>
         </div>
 </div>
 <div class="ui horizontal divider"> <i class="huge loading map icon"></i></div>
@@ -190,11 +213,12 @@
             </div>
         </div>
     </div>
+    
 </div>
     <a href="#0" class="cd-top">Top</a>
 </div>
-<!-- Team RDF Form -->
-<div>
+ <!-- Team RDF Form -->
+<!-- <div>
     <form id="rdfTeamForm" onsubmit="return false;">
         Date:<br>
         <input type="text" name="Date" value="" placeholder="12.5.2016">
@@ -207,16 +231,16 @@
         <br><br>
         <button id="sendTeamRDFButton">Send Data</button>
     </form>
-</div>
+</div> -->
 <!-- Player RDF Form -->
-<div>
+<!-- <div>
     <form id="rdfPlayerForm" onsubmit="return false;">
         Player:<br>
         <input type="text" name="Player" value="" placeholder="Wayne Rooney" />
         <br><br>
         <button id="sendPlayerRDFButton">Send Data</button>
     </form>
-</div>
+</div>  -->
 <!-- RDF Return content -->
 <div id="dbpContent">
     
@@ -271,6 +295,18 @@
                     * @param tweets[1].count -  strength of tweets returned
                     *
                     */
+                     if (tweets[2]){
+                        var imgsdiv = $('<div id="imgs">Photos: </div>');
+                         console.log(tweets[2]);
+                         _.each(tweets[2], function(o){
+                             console.log(o)
+                             imgsdiv.append('<div>' +'' +"<img src='" + o +"'>" + '<br>' + '</div>');
+                            //  var imgs = $();
+                         });
+                         $('#flickr_photos').append(imgsdiv);
+                         
+                    }
+
                     if(tweets[1].count){
                         var counts_db = '<div>' +
                                         '<br>' + 'Results Returned by the  Twitter API: ' +

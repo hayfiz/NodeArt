@@ -25,6 +25,22 @@ var dbUrl = 'localhost/nodeart';
 var collections = ['queries'];
 var db = mongojs(dbUrl, collections);
 
+//Flickr
+/*==============================================*/
+// var SEARCH_TERM = 'Chelsea FC';
+var MIN_WIDTH = 640;
+var NUMBER_OF_PHOTOS = 50; //Max is 500
+var CREATIVE_COMMONS = false;
+var SORT_ORDER = 'relevance';
+/*==============================================*/
+
+var Flickr = require("flickrapi"),
+    flickrOptions = {
+      api_key: "b242f763323669340ff6ba3581919bb4",
+      secret: "67ecc423be339724"
+    };
+
+
 var file = new(NodeStatic.Server)();
 
 // PORT=9000 node serve1.js
@@ -342,6 +358,62 @@ http.createServer(function(req, res) {
                             added_count++;
                         });
 
+                    //     var getImages = function(){
+                    //     Flickr.tokenOnly(flickrOptions, function(error, flickr) {
+                    //         flickr.photos.search({
+                    //             text: queryString,
+                    //             //sort: 'interestingness-desc',
+                    //             //is_commons: CREATIVE_COMMONS, //Keep it to creative commons files
+                    //             per_page: NUMBER_OF_PHOTOS
+                    //         }, function(err, result) {
+                    //         if(err) { throw new Error(err); } 
+                    //             var photos = result.photos.photo;
+                    //             var photoCount = 0; 
+                    //             _.each(photos, function(value, key, list){
+                    //                 flickr.photos.getSizes({
+                    //                     photo_id: value.id}, function(error, image){
+                    //                         if (image) {
+                    //                         var imagearr = [];
+                    //                         var sizes = image.sizes.size;
+                    //                     for(var i=0; i<sizes.length; i++){
+                    //                         var w = sizes[i].width;
+                    //                         if(w >= MIN_WIDTH){
+                    //                             imagearr.push(sizes[i].source);
+                    //                             photoCount++;
+                    //                             console.log(imagearr);
+                    //                         }
+                    //                        if (photoCount >= 1) {
+                    //                            // sortData(imagearr);
+                    //                            break;
+                    //                        }
+                    //                     } 
+                    //                  } else 
+                    //                         {
+                    //                             // sortData([]);
+                    //                         }
+                                        
+                                     
+                                       
+                    //                 });
+                                   
+                    //             });
+                                
+                    //             });
+                    //     });
+                    // };
+
+                    // function sortData(images) {
+                    //     var info = {
+                    //         count: retrieved_count,
+                    //         added: added_count
+                            
+                    //     };
+                    //     tweetObjects.push(sTweets, info, images);
+                    //     sendJsonResponse(tweetObjects);
+                    // }
+
+                    // getImages();
+
                         console.log('Results returned by the database: ' + retrieved_count);
                         console.log('New tweets stored into database: ' + added_count);
                         var info = {
@@ -491,7 +563,7 @@ http.createServer(function(req, res) {
             }
 
             function getData(player) {
-                var query = ;
+                // va r query = ;
                 var client = new SparqlClient(endpoint);
                 console.log("Query to " + endpoint);
                 console.log("Query: "+ query);
