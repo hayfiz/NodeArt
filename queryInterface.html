@@ -134,7 +134,7 @@
             </div>
             <!-- Form Fields End -->
             <!-- Submit Button -->
-        <button id="sendButton" tabindex="0">Search Twitter</button>
+        <button class="ui primary large button" id="sendButton" tabindex="0">Search Twitter</button>
         <!-- Error/ Validation Massages -->
         <div class="ui error message">
             <ul class="list"></ul>
@@ -144,27 +144,36 @@
         </div>
     </form>
     <!--search ends here-->
+
     <form class="ui form" id="rdfPlayerForm" onsubmit="return false;" name="rdfForm">
-       <div class="ui equal width form">
-            <div class="fields">
-                <div class="field">
-                    <label>Date:</label>
-                    <input type="text" name="Date" placeholder="12.5.2016">
+     <div class="ui segment">
+           <div class="ui form">
+           <h4 class="ui dividing header">Team Information</h4>
+                <div class="three fields">
+                    <div class="field">
+                        <label>Date:</label>
+                        <input type="text" name="Date" placeholder="12.5.2016">
+                    </div>
+                    <div class="field">
+                        <label>Team 1:</label>
+                        <input type="text" name="Team1" placeholder="Manchester United F.C." >
+                    </div>
+                    <div class="field">
+                        <label>Team 2:</label>
+                        <input type="text" name="Team2" placeholder="Arsenal F.C." >
+                    </div>
                 </div>
-                <div class="field">
-                    <label>Team 1:</label>
-                    <input type="text" name="Team1" placeholder="Manchester United F.C." >
+                <button class="ui primary button" id="sendTeamRDFButton" tabindex="1">Send Data</button>
                 </div>
-                <div class="field">
-                    <label>Team 2:</label>
-                    <input type="text" name="Team2" placeholder="Arsenal F.C." >
-                </div><br><br>
-                <button class="ui primary large button" id="sendTeamRDFButton" tabindex="1">Send Data</button> <br><br>
-                <!-- <div class="field">
-                    <label>Player:</label>
-                        <input type="text" name="Player" value="" placeholder="Wayne Rooney" /></div>
-                <button class="ui primary large button" id="sendPlayerRDFButton" tabindex="2">Send Data</button> -->
-            </div> 
+                <br>
+                <div class="ui form">
+                <h4 class="ui dividing header">Player Information</h4>
+                 <div class="field">
+                        <label>Player:</label>
+                        <input type="text" name="Player" value="" placeholder="Wayne Rooney" />
+                </div>
+                    <button class="ui primary button" id="sendPlayerRDFButton" tabindex="2">Send Data</button>
+                </div>
             </div>
     </form>
 <!-- UI Messages -->
@@ -185,35 +194,36 @@
         </div>
     </div>
 
-<div class="ui segment">
+<!-- <div class="ui segment">
         <div class="content">
           <div id="map-canvas" style="width:auto;%;height:300pt;align:center;"></div>
           <div id="flickr_photos"></div>
         </div>
+</div> -->
+<div class="spacer">
+<div id="map-canvas"> </div>
+<div id="map_divider"></div>
+<br>
 </div>
-<div class="ui horizontal divider"> <i class="huge loading map icon"></i></div>
+
 <div class="ui three column divided grid" id="content">
+
     <div class="row">
-        <div class=" five wide column">
-            <div class="ui segment">
-                <div id="count_result"></div>
-            </div>
-        </div>
-        <div class="eight wide column">
-            <div class="ui segment">
-                <div id="result" class="ui relaxed  devided list"></div>
-            </div>
-        </div>
+    <div class=" five wide column">
+            <div id="count_result"></div>
+    </div>
+     <div class="eight wide column">
+            <div id="result" class="ui relaxed  devided list"></div>
+    </div>
         <div class=" three wide column">
-            <div class="ui stacked segment">
+            <!-- <div class="ui segment"> -->
                 <div id="counts"></div>
-            </div>
-            <div class="ui stacked segment">
+           <!--  </div> -->
+            <!-- <div class="ui segment"> -->
                 <div id="words"></div>
-            </div>
+           <!--  </div> -->
         </div>
     </div>
-    
 </div>
     <a href="#0" class="cd-top">Top</a>
 </div>
@@ -233,17 +243,18 @@
     </form>
 </div> -->
 <!-- Player RDF Form -->
-<div>
+<!-- <div>
     <form id="rdfPlayerForm" onsubmit="return false;">
         Player:<br>
         <input type="text" name="Player" value="" placeholder="Wayne Rooney" />
         <br><br>
         <button id="sendPlayerRDFButton">Send Data</button>
     </form>
-</div> 
+</div>  -->
+
 <!-- RDF Return content -->
 <div id="dbpContent">
-    
+
 </div>
 
     <script>
@@ -367,12 +378,13 @@
                         var dateReadable, date;
                         dateReadable = new Date(Date.parse(tweet.created_at));
                         date = dateReadable.toDateString();
-                        var tweetHtml = '<div class="item">' +
-                                        "<img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" +
-                                        '<div class="content">' + '<div class="header">' + "Author: " + tweet.user.name + '&nbsp;' +"<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/" + tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+
+                        var tweetdiv = $('<div id="tweet_div" class="ui segments"> </div>');
+                        var tweetHtml = '<div class="ui segment item ">' +
+                                        '<div class="content">' + '<div class="header">'+ "<img class='ui avatar image'  src='" + tweet.user.profile_image_url + " '>" + "Author: " + tweet.user.name + '&nbsp;' +"<a title='"+ tweet.user.screen_name+"' href='http://twitter.com/" + tweet.user.screen_name+"'>" +'@'+ tweet.user.screen_name+ "</a>"+
                                             '&nbsp;'+ '\t\t' + '&nbsp;' + '</div>' + '<span class="date cen">' + ' Date: ' + date +  '</span>' + '<br>'+ '<br>'  + '<div class="description">' + "  Tweet: " + tweet.htmlContent + (tweet.retweeted_status ? "<br>  Retweet: " +'@'+
-                                                    tweet.retweeted_status.user.screen_name : "") +'<div class="ui divider">'+ '</div>' + '</div>';
-                        $('#result').append(tweetHtml); // sends the tweet object to the browser
+                                                    tweet.retweeted_status.user.screen_name : "") + '</div>';
+                        $('#tweet_div').append(tweetHtml);
+                        $('#result').append(tweetdiv); // sends the tweet object to the browser
                         $('#most_frequent_words').remove();
 
                         // Google Maps Implementation
@@ -417,10 +429,12 @@
                     $('#counts').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Most Active Users: ' + '</h4>' +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
                     for(var i= 0; i< 10; i++){
                         if (mostActiveUsers[i]){
-                            $('#counts').append('<div id="most_active_users" class="">' +
+                            var countsdiv = $('<div id="counts_div" class="ui segment"> </div>');
+                            $('#counts_div').append('<div id="most_active_users" class="">' +
                                     "<a title='" + mostActiveUsers[i].user + "' href='http://twitter.com/" +
                                     mostActiveUsers[i].user + "'>" + mostActiveUsers[i].user + '&nbsp;' +
                                     "</a>" +' (' + mostActiveUsers[i].seen + ')');
+                            $('#counts').append(countsdiv);
                         }
                     }
 
@@ -430,10 +444,12 @@
                      $('#words').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Most Frequent Words: ' + '</h4>' +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
                      for(var i= 0; i< 20; i++){
                          if (mostUsedWords[i]) {
+                            var worddiv = $('<div id="words_div" class="ui segment"> </div>');
                               // console.info(mostUsedWords[i]);
-                              $('#words').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" +
+                              $('#words_div').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" +
                                       mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") "
                                       + " </div>");
+                              $('#words').append(worddiv);
                          }
                      }
 
@@ -496,25 +512,27 @@
                     // appending activeUserAndKeywords results to the browser
                     $('#count_result').append("<div id='head_words' class='ui blue cen header'>" +
                         "<h4>" + 'Active Users and Words: ' + '</h4>' +
-                        '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>" + '<br>');
+                        '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
+                    var worddiv = $('<div id="words_div" class="ui segments"> </div>');
                     for(var i= 0; i< 10; i++){
                         if (finalArray[i]) {
-                            $('#count_result').append("<div>" + " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name +
+                            $('#words_div').append("<div class='ui segment'>"+ " <img class='ui avatar image'  src='https://twitter.com/" + finalArray[i].data.author.screen_name + "/profile_image?size=original'>" + '&nbsp;' + 'Author: ' + ' ' + "<a title='" + finalArray[i].data.author.screen_name +
                                 "' href='http://twitter.com/" + finalArray[i].data.author.screen_name + "'>"
                                 + finalArray[i].data.author.screen_name + "</a>" + '&nbsp;&nbsp;  ' +
-                                '  ' + '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +
+                                '  ' + 'Tweets: ' + finalArray[i].data.author.tweet_counts +
                                 '&nbsp;' + "<div class='ui blue cen'>" + "<h5>" +
-                                'Most Frequent Words:' + '</h5>' + '<div class="ui fitted divider">'
-                                + '</div>' + "</div>");
+                                'Most Frequent Words:' + '</h5>' + "</div>");
 
                            var sortedArray =  _.sortBy(_.uniqBy(finalArray[i].data.author.words, 'word'), ['count', 'word']);
                             _.eachRight(_.take(sortedArray,10), function (word) {
-                                $('#count_result').append('<div>' + word.word + '&nbsp;' + '  ' + '(' + word.count + ')'+" </div>");
+                                $('#words_div').append("<div class='ui segment'>"+ '<div>' + word.word + '&nbsp;' + '  ' + '(' + word.count + ')'+" </div>"+" </div>");
                                  });
-                            $('#count_result').append('<div class="ui divider"></div>');
+                            $('words_div').append('<div class="ui divider"></div>');
+                            $('#count_result').append(worddiv)
                         }
 
                     }
+
 
                     /* Geo-location map */
                     function initialize() {
@@ -543,7 +561,8 @@
                     else {
                         $('.gm-style').remove();
                         $('#no_locations').remove();
-                        $('#map-canvas').append("<div id='head_words' class='ui blue cen header'>" + "<h4 id='no_locations'>" + "<br>Your search returned no geo-located tweets :( try again next time :)" + "</h4>" +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>" + '<br>');
+                        $('#map-canvas').append("<div class='ui segment'>" + "<div class='content'>" +"<div id='head_words' class='ui blue cen header'>" + "<h4 id='no_locations'>" + "<br>Your search returned no geo-located tweets :( try again next time :)" + "</h4>" +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>" + "</div>" + "</div>" + '<br>');
+                        $('#map_divider').append("<div class='ui horizontal divider'>" + "<i class='huge loading map icon'>" + "</i>" + "</div>"+ '<br>');
 
                     }
 
@@ -559,12 +578,24 @@
         }
 
         function sendTeamRDFAjaxQuery(url, data) {
+            var $bodyAndHtml = $("#dbpContent,html");
+            /**
+            * Method to scroll to content when query is made.
+            * browser scrolls down to content section
+            *
+            * @method scrollToContent
+            * @param {object} $bodyAndHtml
+            */
+            function scrollToContent () {
+                $bodyAndHtml.animate({scrollTop: $(window).scrollTop() + 1000 });
+            }
         $.ajax({
             type: 'POST',
             url: 'rdfTeamData.html',
             dataType:'json',
             data: data,
             success: function (data) {
+                scrollToContent();
                 var teamInfo = data;
                 for (index in teamInfo) {
                      $('#dbpContent').append(displayInfo(teamInfo[index]));
@@ -643,14 +674,13 @@
                             var str2 = str.replace('http://dbpedia.org/resource/', '');
                             var pos = str2.replace(/_/g,' ');
                         playersPosDiv = $('<div about="dbr:'+str2+'"></div>') 
-                        playersPosDiv.append('<p>Position: <a href="'+info.playerpos.value+'" property="dbo:position" class="'+info.playerpos.type+'">'+pos+'</a></p>')
+                        playersPosDiv.append('<p>Position: <a href="https://en.wikipedia.org/wiki/'+str2+'" property="dbo:position" class="'+info.playerpos.type+'">'+pos+'</a></p>')
                         playersTableDiv.append(playersPosDiv);
                         }
                         if (info.playerheight != undefined) {
                         playersTableDiv.append('<p property="dbo:height" class="'+info.playerheight.type+'">Height: '+info.playerheight.value+'m</p>')
                     }
                     return playersTableDiv;
-                    // var playersTable = $('<table style="width:100%"></table');
 
                 }
             },
@@ -663,100 +693,76 @@
     }
 
         function sendPlayerRDFAjaxQuery(url, data) {
+            var $bodyAndHtml = $("#dbpContent");
+            /**
+            * Method to scroll to content when query is made.
+            * browser scrolls down to content section
+            *
+            * @method scrollToContent
+            * @param {object} $bodyAndHtml
+            */
+            function scrollToContent () {
+                $bodyAndHtml.animate({scrollTop: $(window).scrollTop() + 1000 });
+            }
             $.ajax({
             type: 'POST',
             url: 'rdfPlayerData.html',
             dataType:'json',
             data: data,
             success: function (data) {
+                scrollToContent();
                 var teamInfo = data;
-                // for (index in teamInfo) {
-                //      $('#dbpContent').append(displayInfo(teamInfo[index]));
-                //      // $('#dbpContent').append(playerInfo(teamInfo[index]));
-                // }
-                
-                
-                // function displayInfo(info) {
-                //     var manageruri = info[0].manager.value;
-                //     var managerRDF = manageruri.replace('http://dbpedia.org/resource/','');
-                //     var stadiumuri = info[0].stadium.value;
-                //     var stadiumRDF = stadiumuri.replace('http://dbpedia.org/resource/','');
-
-                //     var teamName = $('<div id="TeamRDFa" about="dbr:'+info[info.length-1].teamDBPName+'"></div>');
-                //         teamName.append('<a href="'+info[0].teamlink.value+'" class="'+info[0].teamlink.type+'"><h3 property="dbp:clubname" xml:lang="'+info[0].clubname["xml:lang"]+'" class="'+info[0].clubname.type+'">'+info[0].clubname.value+'</h3></a>') 
-                //         teamName.append('<p property="dbo:abstract" xml:lang="'+info[0].abstract["xml:lang"]+'" class="'+info[0].abstract.type+'" >Description: '+info[0].abstract.value+'</p>')
-                //         var players = $('<div property="dbp:name"></div>');
-                //             players.append('<p>Players: </p>')
-                //         for (index in info) {
-                //             if (index != (info.length-1)) {
-                //             players.append(playerInfo(info[index]));
-                //                                     }
-                //         }
-                //         teamName.append(players);
-                //         var managerDiv = $('<div property="dbo:manager"></div>');
-                //         var manager = $('<div about="dbr:'+managerRDF+'" class="'+info[0].manager.type+'"></div>');
-                //         manager.append('<p>Manager: </p>')
-                //         if (info[0].managerimg!= undefined) {
-                //                                 manager.append('<img src="'+info[0].managerimg.value+'" property="dbo:thumbnail" rel="foaf:depiction" class="'+info[0].managerimg.type+'"/><br>')
-                //                                 }
-
-                //          if (info[0].managerlink!= undefined && info[0].managername!= undefined) {
-                //             manager.append('<a href="'+info[0].managerlink.value+'" class="'+info[0].managerlink.type+'"><p property="dbp:fullname" class="'+info[0].managername.type+'" xml:lang="'+info[0].managername["xml:lang"]+'">'+info[0].managername.value+'</p></a>')
-                //          } else if(info[0].managername!= undefined){
-                //             manager.append('<p property="dbp:fullname" class="'+info[0].managername.type+'" xml:lang="'+info[0].managername["xml:lang"]+'">'+info[0].managername.value+'</p>')
-                //          }
-
-
-                //          managerDiv.append(manager);
-                //          teamName.append(managerDiv);
+                console.log(teamInfo["player"]);
+                $('#dbpContent').append(displayInfo(teamInfo["player"]));
+                function displayInfo(info) {
+                    var playerdata = $('<div id="playerRDFa" about="dbr:'+info[info.length-1].playerName+'"></div>');
+                        if (info[0].playername !=undefined) {
+                            playerdata.append('<a href="'+info[0].playerlink.value+'" class="'+info[0].playerlink.type+'"><h3 property="dbp:fullname" xml:lang="'+info[0].playername["xml:lang"]+'" class="'+info[0].playername.type+'">'+info[0].playername.value+'</h3></a><br>');
+                        }
                         
-                //         var stadiumDiv = $('<div property="dbo:ground"></div>');
-                //         var stadium = $('<div about="'+stadiumRDF+'" class="'+info[0].stadium.type+'"></div>');
+                        if (info[0].playerimg != undefined) {
+                         playerdata.append('<img src="'+info[0].playerimg.value+'" class="'+info[0].playerimg.type+'"/>');   
+                        }
+                        if (info[0].playerbirthdate != undefined) {
+                            playerdata.append('<p property="dbo:birthDate" datatype="'+info[0].playerbirthdate.datatype+'" class="'+info[0].playerbirthdate.type+'">DOB: '+info[0].playerbirthdate.value+'</p>');
+                        }
+                        
+                        if (info[0].playerdscr != undefined) {
+                            playerdata.append('<p property="dbo:abstract" xml:lang="'+info[0].playerdscr["xml:lang"]+'" class="'+info[0].playerdscr.type+'"> Description:'+info[0].playerdscr.value+' </p>');
+                        }
+                        if (info[0].playerpos != undefined) {
+                            var str = info[0].playerpos.value;
+                            var str2 = str.replace('http://dbpedia.org/resource/', '');
+                            var pos = str2.replace(/_/g,' ');
+                            playersPosDiv = $('<div about="dbr:'+str2+'"></div>') 
+                            playersPosDiv.append('<p>Position: <a href="https://en.wikipedia.org/wiki/'+str2+'" property="dbo:position" class="'+info[0].playerpos.type+'">'+pos+'</a></p>')
+                            playerdata.append(playersPosDiv);
+                                    }
+                        if (info[0].playerclub != undefined) {
+                            var str = info[0].playerclub.value;
+                            var str2 = str.replace('http://dbpedia.org/resource/', '');
+                            var club = str2.replace(/_/g,' ');
 
-                //         stadium.append('<p>Stadium: </p>')
-                //         stadium.append('<img src="'+info[0].stadiumimg.value+'" class="'+info[0].stadiumimg.type+'" property="dbo:thumbnail" rel="foaf:depiction"/><br>')
-                //         if(info[0].stadiumname != undefined) {
-                //          stadium.append('<a href="'+info[0].stadiumlink.value+'" class="'+info[0].stadiumlink.type+'" ><p property="dbp:name" class="'+info[0].stadiumname.type+'" xml:lang="'+info[0].stadiumname["xml:lang"]+'">'+info[0].stadiumname.value+'</p></a>')
-                //         }
-                       
-                //         stadium.append('<p property="dbo:abstract" class="'+info[0].stadiumdscr.type+'" xml:lang="'+info[0].stadiumdscr["xml:lang"]+'">Description: '+info[0].stadiumdscr.value+'</p>');
+                            playerClubDiv = $('<div about="dbr:'+str2+'"></div>');
+                            playerClubDiv.append('<p>Club:<a href="https://en.wikipedia.org/wiki/'+str2+'" property="dbp:clubs" class="'+info[0].playerclub.type+'"> '+club+'</a></p>')
+                            playerdata.append(playerClubDiv);
+                        }
+                        if (info[0].playerno != undefined) {
+                            playerdata.append('<p property="dbp:clubnumber" datatype="'+info[0].playerno.datatype+'" class="'+info[0].playerno.type+'">Player Number: '+info[0].playerno.value+'.</p>');
+                        }
+                        if (info[0].playerclubgoals != undefined) {
+                            playerdata.append('<p property="dbp:goals" datatype="'+info[0].playerclubgoals.datatype+'" class="'+info[0].playerclubgoals.type+'">Club goals: '+info[0].playerclubgoals.value+'</p>');
+                        }
+                        if (info[0].playernationalgoals != undefined) {
+                            playerdata.append('<p property="dbp:nationalgoals" datatype="'+info[0].playernationalgoals.datatype+'" class="'+info[0].playernationalgoals.type+'">National goals: '+info[0].playernationalgoals.value+'</p>');
+                        }
+                        if (info[0].homepage != undefined) {
+                            playerdata.append('<p>Homepage: <a href="'+info[0].homepage.value+'" class="'+info[0].homepage.type+'">'+info[0].homepage.value+'</a></p>');
+                        }
 
-                //         stadiumDiv.append(stadium);
-                //         teamName.append(stadiumDiv);
 
-                //     return teamName;
-                // }
-
-                // function playerInfo(info) {
-                //     var playeruri = info.players.value;
-                //     var playerRDF = playeruri.replace('http://dbpedia.org/resource/','');
-
-
-                //     var playersTableDiv = $('<div about="dbr:'+playerRDF+'" class="'+info.players.type+'" rel="dbp:name"></div>');
-                //         if (info.playerimg != undefined) {
-                //         playersTableDiv.append('<img src="'+info.playerimg.value+'" property="dbo:thumbnail" rel="foaf:depiction"/>');
-                //         }
-                //         if (info.playername != undefined) {
-                //             playersTableDiv.append('<p property="dbp:fullname" xml:lang="'+info.playername["xml:lang"]+'" class="'+info.playername.type+'">Full Name: '+info.playername.value+'</p>')
-                //         }
-                //         if (info.playerdob != undefined) {
-                //         playersTableDiv.append('<p property="dbo:birthDate" datatype="'+info.playerdob.datatype+'" class="'+info.playerdob.type+'" >DOB: '+info.playerdob.value+'</p>');
-                //         }
-                //         if (info.playerpos != undefined) {
-                //             var str = info.playerpos.value;
-                //             var str2 = str.replace('http://dbpedia.org/resource/', '');
-                //             var pos = str2.replace(/_/g,' ');
-                //         playersPosDiv = $('<div about="dbr:'+str2+'"></div>') 
-                //         playersPosDiv.append('<p>Position: <a href="'+info.playerpos.value+'" property="dbo:position" class="'+info.playerpos.type+'">'+pos+'</a></p>')
-                //         playersTableDiv.append(playersPosDiv);
-                //         }
-                //         if (info.playerheight != undefined) {
-                //         playersTableDiv.append('<p property="dbo:height" class="'+info.playerheight.type+'">Height: '+info.playerheight.value+'m</p>')
-                //     }
-                //     return playersTableDiv;
-                    // var playersTable = $('<table style="width:100%"></table');
-
-                // }
+                    return playerdata; 
+                }
             },
             error: function (xhr, status, error) {
                 console.log('Error: ' + error.message);

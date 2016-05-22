@@ -570,16 +570,18 @@ http.createServer(function(req, res) {
                             "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"+
                             "PREFIX foaf: <http://xmlns.com/foaf/0.1/>"+
 
-                            "SELECT ?playername ?playerimg ?playerpos ?playerdscr ?playerclub ?playerno ?playerclubgoals ?playernationalgoals ?homepage WHERE {"+
-                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaP:fullname ?playername."+
-                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaO:thumbnail ?playerimg."+
-                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaO:position ?playerpos."+
-                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaO:abstract ?playerdscr."+
-                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaP:clubs ?playerclub."+
-                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaP:clubnumber ?playerno."+
-                            "OPTIONAL {<http://dbpedia.org/resource/Wayne_Rooney> dbpediaP:goals ?playerclubgoals.}"+
-                            "OPTIONAL {<http://dbpedia.org/resource/Wayne_Rooney> dbpediaP:nationalgoals ?playernationalgoals.}"+
-                            "OPTIONAL {<http://dbpedia.org/resource/Wayne_Rooney> foaf:homepage ?homepage.}"+
+                            "SELECT ?playername ?playerlink ?playerbirthdate ?playerimg ?playerpos ?playerdscr ?playerclub ?playerno ?playerclubgoals ?playernationalgoals ?homepage WHERE {"+
+                            "?player dbpediaP:fullname ?playername."+
+                            "?player prov:wasDerivedFrom ?playerlink."+
+                            "?player dbpediaP:birthDate ?playerbirthdate."+
+                            "?player dbpediaO:thumbnail ?playerimg."+
+                            "?player dbpediaO:position ?playerpos."+
+                            "?player dbpediaO:abstract ?playerdscr."+
+                            "?player dbpediaP:clubs ?playerclub."+
+                            "?player dbpediaP:clubnumber ?playerno."+
+                            "OPTIONAL {?player dbpediaP:goals ?playerclubgoals.}"+
+                            "OPTIONAL {?player dbpediaP:nationalgoals ?playernationalgoals.}"+
+                            "OPTIONAL {?player foaf:homepage ?homepage.}"+
 
                             "FILTER (lang(?playername) = 'en')"+
                             "FILTER (lang(?playerdscr) = 'en')"+
@@ -591,9 +593,9 @@ http.createServer(function(req, res) {
                         .bind('player', '<http://dbpedia.org/resource/'+player+'>')
                         .execute(function(err, results) {
                             if (results) {
-                                resultData[player] = results.results.bindings;
-                                resultData[player].push({playerName: player})
-                                console.log(JSON.stringify(resultData[player], null, 20));
+                                resultData["player"] = results.results.bindings;
+                                resultData["player"].push({playerName: player})
+                                console.log(JSON.stringify(resultData["player"], null, 20));
                                 res.end(JSON.stringify(resultData));
                             }
                         })
