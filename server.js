@@ -556,21 +556,53 @@ http.createServer(function(req, res) {
         });
         req.on('end', function() {
             var data = JSON.parse(body);
-
             for (index in data) {
                 var str = data[index];
                 data[index] = str.replace(/ /g, '_');
             }
 
             function getData(player) {
-                // va r query = ;
+                var resultData = {};
+                var query = "PREFIX dbpediaO: <http://dbpedia.org/ontology/>"+
+                            "PREFIX dbpediaP: <http://dbpedia.org/property/>"+
+                            "PREFIX prov: <http://www.w3.org/ns/prov#>"+
+                            "PREFIX dct:  <http://purl.org/dc/terms/>"+
+                            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"+
+                            "PREFIX foaf: <http://xmlns.com/foaf/0.1/>"+
+
+                            "SELECT ?playername ?playerimg ?playerpos ?playerdscr ?playerclub ?playerno ?playerclubgoals ?playernationalgoals ?homepage WHERE {"+
+                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaP:fullname ?playername."+
+                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaO:thumbnail ?playerimg."+
+                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaO:position ?playerpos."+
+                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaO:abstract ?playerdscr."+
+                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaP:clubs ?playerclub."+
+                            "<http://dbpedia.org/resource/Wayne_Rooney> dbpediaP:clubnumber ?playerno."+
+                            "OPTIONAL {<http://dbpedia.org/resource/Wayne_Rooney> dbpediaP:goals ?playerclubgoals.}"+
+                            "OPTIONAL {<http://dbpedia.org/resource/Wayne_Rooney> dbpediaP:nationalgoals ?playernationalgoals.}"+
+                            "OPTIONAL {<http://dbpedia.org/resource/Wayne_Rooney> foaf:homepage ?homepage.}"+
+
+                            "FILTER (lang(?playername) = 'en')"+
+                            "FILTER (lang(?playerdscr) = 'en')"+
+                            "} LIMIT 1";
                 var client = new SparqlClient(endpoint);
                 console.log("Query to " + endpoint);
                 console.log("Query: "+ query);
+                client.query(query)
+                        .bind('player', '<http://dbpedia.org/resource/'+player+'>')
+                        .execute(function(err, results) {
+                            if (results) {
+                                resultData[player] = results.results.bindings;
+                                resultData[player].push({playerName: player})
+                                console.log(JSON.stringify(resultData[player], null, 20));
+                                res.end(JSON.stringify(resultData));
+                            }
+                        })
 
             }
 
-                      })
+            getData(data.Player)
+
+        })
                       
     } else {
         // Handles server errors.
