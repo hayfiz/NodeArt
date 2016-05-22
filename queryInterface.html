@@ -216,12 +216,8 @@
             <div id="result" class="ui relaxed  devided list"></div>
     </div>
         <div class=" three wide column">
-            <!-- <div class="ui segment"> -->
                 <div id="counts"></div>
-           <!--  </div> -->
-            <!-- <div class="ui segment"> -->
                 <div id="words"></div>
-           <!--  </div> -->
         </div>
     </div>
 </div>
@@ -427,30 +423,31 @@
                     // Appending MostActiveUsers based on Counts to the browser
                     $('#counts').html('');
                     $('#counts').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Most Active Users: ' + '</h4>' +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
+                    var countlist = $('<div id="counts_div" class="ui segments"> </div>');
                     for(var i= 0; i< 10; i++){
                         if (mostActiveUsers[i]){
-                            var countsdiv = $('<div id="counts_div" class="ui segment"> </div>');
-                            $('#counts_div').append('<div id="most_active_users" class="">' +
+                            $('#counts_div').append('<div id="most_active_users" class="ui segment">' +
                                     "<a title='" + mostActiveUsers[i].user + "' href='http://twitter.com/" +
                                     mostActiveUsers[i].user + "'>" + mostActiveUsers[i].user + '&nbsp;' +
                                     "</a>" +' (' + mostActiveUsers[i].seen + ')');
-                            $('#counts').append(countsdiv);
+                             $('#counts').append(countlist)
                         }
                     }
 
                     var finalArray = [];
                     // Sorting and Appending MostUsedWords based on counts to the browser
                     mostUsedWords.sort(function(a, b){ return b.count - a.count;});
-                     $('#words').append("<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Most Frequent Words: ' + '</h4>' +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
+                     $('#words').append('<br>'+ "<div id='head_words' class='ui blue cen header'>" + "<h4>" + 'Most Frequent Words: ' + '</h4>' +  '<div class="ui horizontal divider">'+ '-' + '</div>' + "</div>");
+                     var wordlist = $('<div id="words_di" class="ui segments"> </div>');
                      for(var i= 0; i< 20; i++){
                          if (mostUsedWords[i]) {
-                            var worddiv = $('<div id="words_div" class="ui segment"> </div>');
                               // console.info(mostUsedWords[i]);
-                              $('#words_div').append('<div id="most_frequent_words">' + ' ' + "&nbsp;&nbsp;&nbsp;" +
+                              $('#words_di').append('<div id="most_frequent_words" class="ui segment">' + ' ' + "&nbsp;&nbsp;&nbsp;" +
                                       mostUsedWords[i].word  + ':'+ '&nbsp;&nbsp;'+'(' + mostUsedWords[i].count + ") "
                                       + " </div>");
-                              $('#words').append(worddiv);
+                              $('#words').append(wordlist)
                          }
+
                      }
 
                     /**
